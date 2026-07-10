@@ -6,6 +6,8 @@ import { scrapeWebsite } from '@/lib/scrapers/website';
 import { Redis } from '@upstash/redis';
 import { adminDb, adminAuth } from '@/utils/firebaseAdmin';
 
+export const maxDuration = 60;
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL!,
