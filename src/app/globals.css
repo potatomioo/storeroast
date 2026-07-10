@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fafafa;
+  --foreground: #111111;
+  --card-bg: #ffffff;
+  --border: #eaeaea;
+  --primary-gradient: linear-gradient(135deg, #4f46e5, #ec4899, #8b5cf6);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-outfit);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), sans-serif;
+}
