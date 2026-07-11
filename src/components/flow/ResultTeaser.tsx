@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Lock, Share2, ArrowLeft, Download } from 'lucide-react';
-import html2canvas from 'html2canvas';
+import * as htmlToImage from 'html-to-image';
 
 export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: { roastData: any, onPaid: () => void, onBack: () => void, isPaidUser: boolean }) {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -15,12 +15,10 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
     if (!cardRef.current) return;
     setIsSharing(true);
     try {
-      const canvas = await html2canvas(cardRef.current, { 
-        scale: 2, 
-        useCORS: true,
+      const imageUrl = await htmlToImage.toPng(cardRef.current, {
+        pixelRatio: 2,
         backgroundColor: '#ffffff'
       });
-      const imageUrl = canvas.toDataURL('image/png');
       
       // Auto download
       const link = document.createElement('a');

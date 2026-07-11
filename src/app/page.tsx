@@ -140,8 +140,27 @@ export default function Home() {
       return;
     }
     
-    // Redirect to the real Dodo Payment Link ($0.01 test product)
-    window.location.href = `https://test.checkout.dodopayments.com/buy/pdt_0NiWKj0bTQDcbIpGEtl68?quantity=1&customer_email=${encodeURIComponent(session.email)}`;
+    try {
+      const token = await session.getIdToken();
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          return_url: window.location.href
+        })
+      });
+      const data = await res.json();
+      if (data.checkout_url) {
+        window.location.href = data.checkout_url;
+      } else {
+        alert(data.error || 'Failed to create checkout session');
+      }
+    } catch (err: any) {
+      alert('Error connecting to checkout: ' + err.message);
+    }
   };
 
   return (
