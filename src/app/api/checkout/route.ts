@@ -18,13 +18,13 @@ export async function POST(req: NextRequest) {
     let user = null;
     
     if (!adminAuth) {
-      return NextResponse.json({ error: 'Firebase Admin not initialized (Check Vercel env vars)' }, { status: 500 });
+      return NextResponse.json({ error: 'Firebase Admin not initialized. Check your Vercel FIREBASE_SERVICE_ACCOUNT_KEY environment variable (it must be valid JSON).' }, { status: 500 });
     }
     
     user = await adminAuth.verifyIdToken(token);
     
     if (!user || !user.email) {
-      return NextResponse.json({ error: 'User email missing from Firebase token' }, { status: 400 });
+      return NextResponse.json({ error: 'User email not found' }, { status: 400 });
     }
 
     const { return_url } = await req.json();
