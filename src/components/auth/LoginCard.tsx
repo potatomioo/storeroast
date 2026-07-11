@@ -59,11 +59,11 @@ export default function LoginCard({ onBack }: { onBack: () => void }) {
             <ShieldCheck className="w-6 h-6 text-white" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            {step === 'EMAIL' ? 'Create an account' : 'Check your email'}
+            {step === 'EMAIL' ? 'Join StoreRoast' : 'Check your email'}
           </h2>
           <p className="text-gray-500 font-medium">
             {step === 'EMAIL'
-              ? 'Sign in to unlock full roasts and buy credits. No password required.'
+              ? 'Sign in to unlock brutal AI roasts and actionable insights.'
               : `We sent a magic link to ${email}`}
           </p>
         </div>
@@ -118,7 +118,7 @@ export default function LoginCard({ onBack }: { onBack: () => void }) {
             <CheckCircle2 className="w-16 h-16 text-green-500 animate-bounce" />
             <div className="bg-gray-50 p-6 rounded-2xl border-2 border-gray-200 text-gray-700 font-medium text-lg leading-relaxed">
               We just sent a secure link to <strong className="text-black">{email}</strong>.<br/><br/>
-              Click the link in the email to instantly sign in. You can safely close this window.
+              <span className="text-red-500 font-bold">Important:</span> Click the link <strong className="text-black">on this device</strong> to sign in.
             </div>
             
             <button

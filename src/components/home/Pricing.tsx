@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Pricing() {
+export default function Pricing({ onBuy, isLoggedIn }: { onBuy?: () => void, isLoggedIn?: boolean }) {
   return (
     <section id="pricing" className="mt-32 w-full max-w-5xl flex flex-col items-center">
       <h2 className="text-3xl font-bold tracking-tight mb-2">Simple, brutal pricing.</h2>
@@ -36,6 +36,14 @@ export default function Pricing() {
             <li className="flex items-center gap-3 text-gray-900"><div className="w-1.5 h-1.5 rounded-full bg-purple-500"/> Reviews Sentiment</li>
             <li className="flex items-center gap-3 text-gray-900"><div className="w-1.5 h-1.5 rounded-full bg-purple-500"/> "Fix Today" Action Plan</li>
           </ul>
+          {onBuy && (
+            <button 
+              onClick={onBuy}
+              className="w-full bg-black text-white rounded-xl py-3.5 font-bold hover:bg-gray-800 transition-colors shadow-lg"
+            >
+              {isLoggedIn ? 'Buy 1 Credit ($0.01 Test)' : 'Sign In to Buy'}
+            </button>
+          )}
         </div>
       </div>
     </section>

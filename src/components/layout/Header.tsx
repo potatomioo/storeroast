@@ -1,7 +1,7 @@
 import React from 'react';
 import { LogOut, Coins } from 'lucide-react';
 
-export default function Header({ session, credits, onLogout }: { session?: any, credits?: number, onLogout?: () => void }) {
+export default function Header({ session, credits, onLogout, onGetStarted }: { session?: any, credits?: number, onLogout?: () => void, onGetStarted?: () => void }) {
   return (
     <header className="w-full max-w-6xl py-8 px-6 flex items-center justify-between z-10">
       <div className="font-bold text-2xl tracking-tight cursor-pointer" onClick={() => window.location.reload()}>StoreRoast</div>
@@ -22,7 +22,7 @@ export default function Header({ session, credits, onLogout }: { session?: any, 
             </button>
           </div>
         ) : (
-          <button onClick={() => window.location.reload()} className="bg-black text-white px-6 py-2.5 rounded-full text-sm font-medium hover:scale-105 transition-transform">
+          <button onClick={onGetStarted} className="bg-black text-white px-6 py-2.5 rounded-full text-sm font-medium hover:scale-105 transition-transform">
             Get Started
           </button>
         )}

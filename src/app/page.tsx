@@ -13,9 +13,9 @@ import { UploadCloud, Sparkles, AlertCircle, FileText, Smartphone, Globe, Share2
 import { motion, AnimatePresence } from 'framer-motion';
 import { auth, db } from '../utils/firebase';
 import { onAuthStateChanged, isSignInWithEmailLink, signInWithEmailLink, signOut, User } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 
-type AppState = 'IDLE' | 'LOADING' | 'TEASER';
+type AppState = 'IDLE' | 'LOADING' | 'TEASER' | 'PRICING';
 
 export default function Home() {
   const [appState, setAppState] = useState<AppState>('IDLE');
@@ -49,35 +49,39 @@ export default function Home() {
     };
     handleMagicLink();
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setSession(user);
       if (user) {
-        fetchOrCreateProfile(user);
+        // Setup real-time listener for credits
+        const userRef = doc(db, 'profiles', user.uid);
+        const unsubscribeSnapshot = onSnapshot(userRef, async (docSnap) => {
+          if (docSnap.exists()) {
+            setCredits(docSnap.data().credits || 0);
+          } else {
+            await setDoc(userRef, { email: user.email, credits: 0 });
+            setCredits(0);
+          }
+        });
         setShowLogin(false);
+        // Save the snapshot unsubscribe function to window so we can clean it up later if needed
+        (window as any)._unsubscribeSnapshot = unsubscribeSnapshot;
       } else {
         setCredits(0);
+        if ((window as any)._unsubscribeSnapshot) {
+          (window as any)._unsubscribeSnapshot();
+        }
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribeAuth();
+      if ((window as any)._unsubscribeSnapshot) {
+        (window as any)._unsubscribeSnapshot();
+      }
+    };
   }, []);
 
-  const fetchOrCreateProfile = async (user: User) => {
-    try {
-      const userRef = doc(db, 'profiles', user.uid);
-      const userSnap = await getDoc(userRef);
-      
-      if (userSnap.exists()) {
-        setCredits(userSnap.data().credits || 0);
-      } else {
-        // Create new profile with 0 credits
-        await setDoc(userRef, { email: user.email, credits: 0 });
-        setCredits(0);
-      }
-    } catch (err) {
-      console.error("Error fetching profile", err);
-    }
-  };
+  // (fetchOrCreateProfile removed as it's now handled by onSnapshot)
 
   const handleLogout = async () => {
     await signOut(auth);
@@ -102,14 +106,15 @@ export default function Home() {
         body: JSON.stringify({ url })
       });
 
-      if (res.status === 403) { // LIMIT_REACHED
+      if (res.status === 403 || res.status === 402) {
         setAppState('IDLE');
-        setShowLogin(true);
-        return;
-      }
-      if (res.status === 402) { // OUT_OF_CREDITS
-        setAppState('IDLE');
-        handlePaymentMock();
+        if (session) {
+          // Logged in but out of credits
+          setAppState('PRICING');
+        } else {
+          // Not logged in and hit free limit
+          setShowLogin(true);
+        }
         return;
       }
       const data = await res.json();
@@ -141,7 +146,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex flex-col items-center bg-gray-50 text-black">
-      <Header session={session} credits={credits} onLogout={handleLogout} />
+      <Header session={session} credits={credits} onLogout={handleLogout} onGetStarted={() => setShowLogin(true)} />
 
       {showLogin ? (
         <LoginCard onBack={() => setShowLogin(false)} />
@@ -149,9 +154,22 @@ export default function Home() {
         <>
           <Hero onRoast={handleRoastStart} />
           <Features />
-          <Pricing />
+          <Pricing onBuy={handlePaymentMock} isLoggedIn={!!session} />
           <FooterCTA />
         </>
+      ) : appState === 'PRICING' ? (
+        <div className="w-full max-w-6xl px-4 py-12 flex flex-col items-center">
+          <div className="w-full flex justify-start mb-6 max-w-4xl">
+            <button onClick={() => setAppState('IDLE')} className="flex items-center gap-2 text-gray-500 hover:text-black font-medium transition-colors">
+              <AlertCircle className="w-4 h-4" /> Go Back
+            </button>
+          </div>
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">You're out of credits!</h2>
+            <p className="text-gray-500">Pick a plan below to continue roasting.</p>
+          </div>
+          <Pricing onBuy={handlePaymentMock} isLoggedIn={!!session} />
+        </div>
       ) : appState === 'LOADING' ? (
         <LoadingScreen />
       ) : appState === 'TEASER' && roastData ? (
