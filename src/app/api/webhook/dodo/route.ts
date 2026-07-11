@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/utils/firebaseAdmin';
 import DodoPayments from 'dodopayments';
 
-const dodo = new DodoPayments({ bearerToken: 'dummy' });
+const dodo = new DodoPayments({ 
+  bearerToken: 'dummy',
+  environment: 'test_mode'
+});
 
 export async function POST(req: NextRequest) {
   try {

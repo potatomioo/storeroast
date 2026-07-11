@@ -4,7 +4,8 @@ import { adminAuth } from '@/utils/firebaseAdmin';
 
 const client = new DodoPayments({
   bearerToken: process.env.DODO_PAYMENTS_API_KEY || 'dummy',
-  environment: process.env.NODE_ENV === 'production' ? 'live_mode' : 'test_mode',
+  // Force test mode while we are testing, regardless of Vercel NODE_ENV
+  environment: 'test_mode',
 });
 
 export async function POST(req: NextRequest) {
@@ -18,10 +19,14 @@ export async function POST(req: NextRequest) {
     let user = null;
     
     if (!adminAuth) {
-      return NextResponse.json({ error: 'Firebase Admin not initialized. Check your Vercel FIREBASE_SERVICE_ACCOUNT_KEY environment variable (it must be valid JSON).' }, { status: 500 });
+      return NextResponse.json({ error: 'Firebase Admin not initialized.' }, { status: 500 });
     }
     
-    user = await adminAuth.verifyIdToken(token);
+    try {
+      user = await adminAuth.verifyIdToken(token);
+    } catch (authErr: any) {
+      return NextResponse.json({ error: 'Firebase Auth Error: ' + authErr.message }, { status: 401 });
+    }
     
     if (!user || !user.email) {
       return NextResponse.json({ error: 'User email not found' }, { status: 400 });
