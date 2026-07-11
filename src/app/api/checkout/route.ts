@@ -17,12 +17,14 @@ export async function POST(req: NextRequest) {
     const token = authHeader.replace('Bearer ', '');
     let user = null;
     
-    if (adminAuth) {
-      user = await adminAuth.verifyIdToken(token);
+    if (!adminAuth) {
+      return NextResponse.json({ error: 'Firebase Admin not initialized (Check Vercel env vars)' }, { status: 500 });
     }
     
+    user = await adminAuth.verifyIdToken(token);
+    
     if (!user || !user.email) {
-      return NextResponse.json({ error: 'User email not found' }, { status: 400 });
+      return NextResponse.json({ error: 'User email missing from Firebase token' }, { status: 400 });
     }
 
     const { return_url } = await req.json();
