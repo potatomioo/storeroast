@@ -10,7 +10,14 @@ if (!getApps().length) {
     
     if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
       // Production (Vercel): Read from secure Environment Variable
-      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+      // Handle Vercel escaping newlines in JSON strings
+      const rawKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+      try {
+        serviceAccount = JSON.parse(rawKey);
+      } catch (parseError) {
+        // Fallback: if Vercel escaped newlines or it's a single line string with literal \n
+        serviceAccount = JSON.parse(rawKey.replace(/\\n/g, '\n'));
+      }
     } else {
       // Local Development: Read from JSON file
       const serviceAccountPath = path.join(process.cwd(), 'firebase-service-account.json');
