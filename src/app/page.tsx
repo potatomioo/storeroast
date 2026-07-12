@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { auth, db } from '../utils/firebase';
 import { onAuthStateChanged, isSignInWithEmailLink, signInWithEmailLink, signOut, User } from 'firebase/auth';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import toast from 'react-hot-toast';
 
 type AppState = 'IDLE' | 'LOADING' | 'TEASER' | 'PRICING';
 
@@ -41,6 +42,7 @@ export default function Home() {
             window.localStorage.removeItem('emailForSignIn');
             // Remove the magic link query params so they don't break subsequent reloads
             window.history.replaceState({}, document.title, window.location.pathname);
+            toast.success("Successfully signed in!");
           } catch (error) {
             console.error("Error signing in with magic link", error);
           }
@@ -48,6 +50,15 @@ export default function Home() {
       }
     };
     handleMagicLink();
+
+    // Clean up generic Dodo redirect parameters if present
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('payment_id')) {
+      if (urlParams.get('status') === 'succeeded') {
+        toast.success("Payment successful! 15 Credits added.");
+      }
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
 
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setSession(user);
@@ -130,7 +141,7 @@ export default function Home() {
     } catch (err: any) {
       setError(err.message);
       setAppState('IDLE');
-      alert(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -156,10 +167,10 @@ export default function Home() {
       if (data.checkout_url) {
         window.location.href = data.checkout_url;
       } else {
-        alert(data.error || 'Failed to create checkout session');
+        toast.error(data.error || 'Failed to create checkout session');
       }
     } catch (err: any) {
-      alert('Error connecting to checkout: ' + err.message);
+      toast.error('Error connecting to checkout: ' + err.message);
     }
   };
 

@@ -5,59 +5,71 @@ import { Eye, PenLine, MessageSquareQuote, CheckCircle2, ScanSearch } from 'luci
 export default function Features() {
   return (
     <>
-      {/* Main Feature Showcase */}
+      {/* Main Feature Showcase - Wall of Flame */}
       <motion.section 
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         className="mt-32 w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-gray-50/50 rounded-3xl p-8 lg:p-16 border border-gray-100"
       >
-        <div className="relative rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm p-4">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50 z-0" />
-          <div className="relative z-10 w-full aspect-[4/3] bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200/50 overflow-hidden">
-             {/* Mock UI graphic representing precision analysis */}
-             <div className="w-[80%] h-[70%] bg-[#111] rounded-xl shadow-2xl p-4 flex flex-col gap-3">
-                <div className="h-4 w-1/3 bg-gray-700 rounded" />
-                <div className="flex gap-4 mt-2">
-                   <div className="w-12 h-12 rounded bg-gray-800" />
-                   <div className="flex-1 space-y-2">
-                     <div className="h-2 w-3/4 bg-gray-700 rounded" />
-                     <div className="h-2 w-1/2 bg-gray-800 rounded" />
-                   </div>
-                </div>
-                <div className="flex-1 rounded border border-gray-700 mt-2 p-2 flex flex-col gap-2 relative">
-                   {/* Fake tooltip */}
-                   <div className="absolute -left-4 top-4 bg-blue-500 text-white text-[8px] px-2 py-1 rounded font-bold shadow-lg">
-                     Weak CTA
-                   </div>
-                   <div className="h-2 w-full bg-gray-800 rounded" />
-                   <div className="h-2 w-5/6 bg-gray-800 rounded" />
-                   <div className="h-2 w-4/6 bg-gray-800 rounded" />
-                </div>
-             </div>
+        <div className="flex flex-col gap-6 order-2 lg:order-1">
+          <h2 className="text-3xl font-bold tracking-tight">Wall of Flame</h2>
+          <p className="text-gray-500 text-lg leading-relaxed">
+            Every week, we incinerate hundreds of mediocre listings. Join the ranks of developers who survived the roast and doubled their installs.
+          </p>
+          
+          <div className="mt-4">
+            <div className="flex justify-between text-xs font-bold mb-2">
+              <span className="text-gray-900">500+ roasted this week</span>
+              <span className="text-blue-500 tracking-widest uppercase">Destruction Meter</span>
+            </div>
+            <div className="h-4 w-full bg-gray-200 rounded-full overflow-hidden mb-2">
+              <div className="h-full w-3/4 bg-gradient-to-r from-fuchsia-500 to-blue-500 rounded-full" />
+            </div>
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>Soft Launch</span>
+              <span>Total Annihilation</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="text-4xl font-black text-gray-900 mb-1">124%</div>
+              <div className="text-[10px] font-bold text-gray-400 tracking-widest uppercase">Avg. CVR Increase</div>
+            </div>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="text-4xl font-black text-gray-900 mb-1">15k+</div>
+              <div className="text-[10px] font-bold text-gray-400 tracking-widest uppercase">Total Apps Roasted</div>
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-col gap-6">
-          <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center shadow-md">
-            <ScanSearch className="text-white w-6 h-6" />
-          </div>
-          <h2 className="text-3xl font-bold tracking-tight">Precision Analysis</h2>
-          <p className="text-gray-500 text-lg leading-relaxed">
-            Our engine dissects every pixel of your screenshots and every word of your description against top-performing benchmarks in your category.
-          </p>
-          <ul className="space-y-4 mt-2">
-            {[
-              "OCR detection for visual hierarchy issues.",
-              "Sentiment analysis on recent user reviews.",
-              "Keyword density and ASO score."
-            ].map((item, i) => (
-              <li key={i} className="flex items-center gap-3 text-gray-600 font-medium">
-                <CheckCircle2 className="w-5 h-5 text-blue-500" />
-                {item}
-              </li>
-            ))}
-          </ul>
+        <div className="relative order-1 lg:order-2 h-full min-h-[400px] flex items-center justify-center">
+           {/* Testimonial 1 */}
+           <div className="absolute top-0 right-0 bg-white p-6 rounded-2xl shadow-xl w-[90%] border border-gray-100 z-10 rotate-2 hover:rotate-0 transition-transform">
+             <p className="text-gray-600 font-medium italic mb-6">
+               "They told me my main screenshot looked like it was from 2008. Brutal, but they were right. Fixed it, conversions up 40%."
+             </p>
+             <div className="flex items-center gap-3">
+               <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-xs font-bold">DM</div>
+               <span className="text-sm font-bold text-gray-900">@dev_marco</span>
+             </div>
+           </div>
+
+           {/* Survivor Badge */}
+           <div className="absolute top-1/2 left-4 -translate-y-1/2 bg-black text-white p-6 rounded-2xl shadow-2xl z-20 -rotate-3 hover:rotate-0 transition-transform">
+             <div className="text-2xl font-black italic tracking-tight mb-1">SURVIVOR</div>
+             <div className="text-xs text-gray-400 font-medium">App Store Rank #4 (FinTech)</div>
+           </div>
+
+           {/* Testimonial 2 */}
+           <div className="absolute bottom-0 left-8 bg-white p-6 rounded-2xl shadow-xl w-[85%] border border-gray-100 z-10 -rotate-2 hover:rotate-0 transition-transform">
+             <div className="flex text-yellow-400 mb-3 text-sm">
+               ★★★★★
+             </div>
+             <p className="text-gray-900 font-bold mb-1">"The only ASO tool I trust."</p>
+             <p className="text-gray-500 text-sm font-medium">No fluff, just pure data-driven destruction.</p>
+           </div>
         </div>
       </motion.section>
 

@@ -59,58 +59,79 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
         ref={cardRef} 
         initial={{ opacity: 0, y: 20 }} 
         animate={{ opacity: 1, y: 0 }} 
-        className="w-full bg-white rounded-3xl border-2 border-gray-900 p-8 md:p-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mb-8"
+        className="w-full bg-[#fdfbf7] rounded-none border-4 border-double border-gray-900 p-8 md:p-12 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] mb-8 font-serif"
       >
-        <div className="flex flex-col items-center text-center mb-10 pb-10 border-b-2 border-gray-100">
-          <div className="inline-block bg-black text-white px-4 py-1.5 rounded-full text-xs font-bold tracking-widest mb-6">
-            STOREROAST.LIVE
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">"{roastData.headline}"</h2>
-          <div className="flex items-center justify-center gap-4">
-            <div className="text-5xl font-black text-red-500">{roastData.score}</div>
-            <div className="text-xl text-gray-400 font-bold mt-2">/ 10</div>
+        <div className="flex flex-col items-center text-center mb-8 pb-8 border-b-2 border-black border-dashed">
+          <div className="font-bold tracking-[0.2em] text-gray-500 uppercase text-xs mb-2">Official Document</div>
+          <h1 className="text-4xl md:text-5xl font-black text-black tracking-tight mb-6 uppercase">Roast Report</h1>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 italic mb-6">"{roastData.headline}"</h2>
+          <div className="flex flex-col items-center bg-white border-2 border-black p-4 rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+             <div className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">Final Grade</div>
+             <div className="flex items-baseline gap-2">
+               <div className="text-6xl font-black text-red-600 leading-none">{roastData.score}</div>
+               <div className="text-2xl font-bold text-gray-400">/ 10</div>
+             </div>
           </div>
         </div>
 
-        <div className="space-y-10">
+        <div className="space-y-8">
           {freeRoasts.map((item: any, idx: number) => (
-            <div key={idx} className="relative">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="bg-red-100 text-red-700 px-3 py-1 rounded-md text-[11px] font-black tracking-widest uppercase">
-                  {item.category} • {item.score}/10
-                </span>
+            <div key={idx} className="relative border-l-4 border-red-500 pl-6 py-2">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-black text-lg uppercase tracking-wider">{item.category}</span>
+                <span className="bg-black text-white px-3 py-1 rounded font-bold text-sm">{item.score}/10</span>
               </div>
-              <p className="text-lg text-gray-900 mb-3 font-medium leading-relaxed">"{item.roast}"</p>
-              <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 text-gray-600 text-sm">
-                <strong className="text-black">Fix it:</strong> {item.fix}
+              <p className="text-lg text-gray-800 mb-3 font-medium italic">"{item.roast}"</p>
+              <div className="bg-red-50 p-4 border border-red-200 text-red-900 font-sans text-sm font-medium">
+                <strong className="text-red-700 font-bold uppercase mr-2">Correction:</strong> {item.fix}
               </div>
             </div>
           ))}
 
           {isPaidUser && roastData.screenshots && roastData.screenshots.length > 0 && (
-            <div className="mt-8 border-t-2 border-gray-100 pt-8">
-              <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4 text-center">Screenshots Analyzed</h4>
+            <div className="mt-12 border-t-2 border-gray-200 pt-8">
+              <h4 className="text-lg font-black uppercase tracking-widest mb-6 text-center">Visual Evidence</h4>
               <div className="flex gap-4 overflow-x-auto pb-4 snap-x justify-center">
                 {roastData.screenshots.map((url: string, i: number) => (
-                  <img key={i} src={url} alt={`Screenshot ${i+1}`} className="h-64 object-contain rounded-xl border border-gray-200 shadow-sm snap-center" crossOrigin="anonymous" />
+                  <img key={i} src={url} alt={`Screenshot ${i+1}`} className="h-64 object-contain border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] snap-center bg-white p-2" crossOrigin="anonymous" />
                 ))}
               </div>
             </div>
           )}
 
+          {isPaidUser && roastData.better_student && (
+             <div className="mt-8 border-2 border-blue-900 bg-blue-50 p-6 shadow-[6px_6px_0px_0px_rgba(30,58,138,1)]">
+               <div className="flex items-center justify-between mb-4 border-b border-blue-200 pb-2">
+                 <h4 className="text-blue-900 font-black uppercase tracking-wider">The "Better Student"</h4>
+                 <span className="bg-blue-900 text-white px-3 py-1 text-xs font-bold uppercase rounded">Class Benchmark</span>
+               </div>
+               <p className="text-blue-800 font-bold text-xl italic mb-2">{roastData.better_student.app_name}</p>
+               <p className="text-blue-900 font-medium font-sans leading-relaxed">{roastData.better_student.roast}</p>
+             </div>
+          )}
+
           {isPaidUser && roastData.verdict && (
-             <div className="mt-12 p-6 bg-red-50 border-2 border-red-200 rounded-2xl">
-               <h4 className="text-red-800 font-bold mb-2 uppercase tracking-wider text-sm">Final Verdict</h4>
-               <p className="text-red-900 font-medium">{roastData.verdict}</p>
+             <div className="mt-8 border-t-2 border-black pt-8">
+               <h4 className="font-black uppercase tracking-widest mb-3 text-red-600">Principal's Remarks</h4>
+               <p className="text-xl font-medium leading-relaxed">"{roastData.verdict}"</p>
              </div>
           )}
           
           {isPaidUser && roastData.fix_today && (
-             <div className="mt-4 p-6 bg-black text-white rounded-2xl">
-               <h4 className="text-gray-400 font-bold mb-2 uppercase tracking-wider text-sm">The ONE Fix Today</h4>
-               <p className="text-white font-medium">{roastData.fix_today}</p>
+             <div className="mt-8 p-6 bg-black text-white shadow-[6px_6px_0px_0px_rgba(239,68,68,1)]">
+               <h4 className="text-red-500 font-black uppercase tracking-widest mb-2">Mandatory Homework</h4>
+               <p className="text-lg font-bold font-sans">{roastData.fix_today}</p>
              </div>
           )}
+
+          {/* Teacher Signature */}
+          <div className="mt-16 pt-8 border-t border-gray-300 flex justify-end">
+            <div className="flex flex-col items-center">
+               <div className="font-serif text-3xl text-gray-800 italic" style={{ fontFamily: 'var(--font-outfit), cursive' }}>StoreRoast.live</div>
+               <div className="w-48 h-px bg-black mt-2 mb-1"></div>
+               <div className="text-xs uppercase tracking-widest font-bold text-gray-500">Authorized Signature</div>
+            </div>
+          </div>
         </div>
       </motion.div>
 

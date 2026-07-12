@@ -28,7 +28,7 @@ export default function Pricing({ onBuy, isLoggedIn }: { onBuy?: () => void, isL
           <h3 className="text-xl font-bold text-gray-900 mb-2">Full Roast</h3>
           <div className="flex items-end gap-1 mb-6">
             <div className="text-4xl font-bold">$1.99</div>
-            <div className="text-gray-500 font-medium mb-1">/ app</div>
+            <div className="text-gray-500 font-medium mb-1">/ 15 credits</div>
           </div>
           <ul className="space-y-4 flex-1 mb-8">
             <li className="flex items-center gap-3 text-gray-900 font-medium"><div className="w-1.5 h-1.5 rounded-full bg-purple-500"/> Everything in Free</li>
@@ -41,7 +41,7 @@ export default function Pricing({ onBuy, isLoggedIn }: { onBuy?: () => void, isL
               onClick={onBuy}
               className="w-full bg-black text-white rounded-xl py-3.5 font-bold hover:bg-gray-800 transition-colors shadow-lg"
             >
-              {isLoggedIn ? 'Buy 1 Credit ($0.01 Test)' : 'Sign In to Buy'}
+              {isLoggedIn ? 'Buy 15 Credits ($0.01 Test)' : 'Sign In to Buy'}
             </button>
           )}
         </div>

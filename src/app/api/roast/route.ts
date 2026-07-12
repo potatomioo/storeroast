@@ -89,6 +89,7 @@ RULES — STRICTLY FOLLOW:
 3. DARK HUMOR ONLY. Make it sting but laugh-worthy.
 4. SHORT AND PUNCHY. Max 2 sentences per roast. No essays.
 5. THE FIX should be sarcastic too — not boring advice.
+6. BETTER STUDENT: Pick a real, famous, top-performing app in their exact category (e.g., Robinhood for Finance, Tinder for Dating). Compare their listing (ASO, screenshots, copy) to this app's listing to show why the famous app converts better. Focus ONLY on marketing/ASO, not app features.
 
 BAD ROAST EXAMPLE (DO NOT DO THIS):
 "Your description could be more concise and focused on key benefits."
@@ -123,6 +124,10 @@ Return ONLY valid JSON — no markdown:
       "fix": "One sarcastic but actionable fix"
     }
   ],
+  "better_student": {
+    "app_name": "Name of the top-performing competitor",
+    "roast": "Savage 2-sentence explanation of why their listing (screenshots/copy) is superior to this app's."
+  },
   "verdict": "2 sentence brutal final summary",
   "fix_today": "The ONE thing that would save this listing from obscurity"
 }`;
