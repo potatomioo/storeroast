@@ -25,7 +25,8 @@ export async function POST(req: NextRequest) {
     console.log("Payment ID:", (event.data as any)?.payment_id);
     
     if (event.type === 'payment.succeeded') {
-      const email = (event.data as any)?.customer?.email || (event.data as any)?.customer_email || (event as any).customer?.email;
+      const payloadData = event.data as any;
+      const email = payloadData?.metadata?.email || payloadData?.customer?.email || payloadData?.customer_email || (event as any).customer?.email;
       
       if (email && adminDb) {
         // Query the profile document by email

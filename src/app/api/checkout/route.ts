@@ -44,6 +44,9 @@ export async function POST(req: NextRequest) {
       customer: {
         email: user.email
       },
+      metadata: {
+        email: user.email
+      },
       return_url: return_url || 'https://storeroast.live',
     });
 
