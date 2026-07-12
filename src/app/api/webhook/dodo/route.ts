@@ -32,11 +32,16 @@ export async function POST(req: NextRequest) {
     console.log("Payment ID:", (event.data as any)?.payment_id);
     
     if (event.type === 'payment.succeeded') {
+      if (!adminDb) {
+        console.error('Firebase Admin DB is not initialized. Cannot update credits.');
+        return NextResponse.json({ error: 'Firebase Admin DB is not initialized on this server.' }, { status: 500 });
+      }
+
       const payloadData = event.data as any;
       const uid = payloadData?.metadata?.uid;
       const email = payloadData?.metadata?.email || payloadData?.customer?.email || payloadData?.customer_email || (event as any).customer?.email;
       
-      if (uid && adminDb) {
+      if (uid) {
         // Direct document update by uid
         const docRef = adminDb.collection('profiles').doc(uid);
         const docSnap = await docRef.get();
@@ -50,7 +55,7 @@ export async function POST(req: NextRequest) {
           await docRef.set({ email: email || 'unknown', credits: 15 });
           console.log(`Created profile and added 15 credits to uid: ${uid}`);
         }
-      } else if (email && adminDb) {
+      } else if (email) {
         // Fallback: Query by email if uid is somehow missing
         const profilesRef = adminDb.collection('profiles');
         const snapshot = await profilesRef.where('email', '==', email).limit(1).get();
@@ -65,6 +70,7 @@ export async function POST(req: NextRequest) {
         }
       } else {
         console.error('Webhook received but missing both uid and email in payload.');
+        return NextResponse.json({ error: 'Missing uid and email in payload.' }, { status: 400 });
       }
     }
 
