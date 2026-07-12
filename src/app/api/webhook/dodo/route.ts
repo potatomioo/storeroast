@@ -15,11 +15,18 @@ export async function POST(req: NextRequest) {
     const headers: Record<string, string> = {};
     req.headers.forEach((val, key) => { headers[key] = val; });
 
-    // Securely verify signature and unwrap payload
-    const event = dodo.webhooks.unwrap(bodyText, {
-      headers,
-      key: process.env.DODO_WEBHOOK_SECRET!
-    });
+    let event;
+    try {
+      event = dodo.webhooks.unwrap(bodyText, {
+        headers,
+        key: process.env.DODO_WEBHOOK_SECRET!
+      });
+    } catch (unwrapError: any) {
+      console.error("Signature verification failed:", unwrapError.message);
+      console.log("Headers received:", JSON.stringify(headers, null, 2));
+      console.log("Raw body snippet:", bodyText.substring(0, 200));
+      return NextResponse.json({ error: 'Signature verification failed: ' + unwrapError.message }, { status: 400 });
+    }
     
     console.log("Verified Dodo Webhook:", event.type);
     console.log("Payment ID:", (event.data as any)?.payment_id);
