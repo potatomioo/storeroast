@@ -26,10 +26,25 @@ export async function POST(req: NextRequest) {
     
     if (event.type === 'payment.succeeded') {
       const payloadData = event.data as any;
+      const uid = payloadData?.metadata?.uid;
       const email = payloadData?.metadata?.email || payloadData?.customer?.email || payloadData?.customer_email || (event as any).customer?.email;
       
-      if (email && adminDb) {
-        // Query the profile document by email
+      if (uid && adminDb) {
+        // Direct document update by uid
+        const docRef = adminDb.collection('profiles').doc(uid);
+        const docSnap = await docRef.get();
+        
+        if (docSnap.exists) {
+          const currentCredits = docSnap.data()?.credits || 0;
+          await docRef.update({ credits: currentCredits + 15 });
+          console.log(`Successfully added 15 credits to uid: ${uid}`);
+        } else {
+          // If profile doc doesn't exist for some reason, create it
+          await docRef.set({ email: email || 'unknown', credits: 15 });
+          console.log(`Created profile and added 15 credits to uid: ${uid}`);
+        }
+      } else if (email && adminDb) {
+        // Fallback: Query by email if uid is somehow missing
         const profilesRef = adminDb.collection('profiles');
         const snapshot = await profilesRef.where('email', '==', email).limit(1).get();
         
@@ -37,10 +52,12 @@ export async function POST(req: NextRequest) {
           const doc = snapshot.docs[0];
           const currentCredits = doc.data().credits || 0;
           await doc.ref.update({ credits: currentCredits + 15 });
-          console.log(`Successfully added 15 credits to ${email}`);
+          console.log(`Fallback: Successfully added 15 credits to email: ${email}`);
         } else {
-          console.error(`Profile not found for email: ${email}`);
+          console.error(`Profile not found for email: ${email} and no uid provided.`);
         }
+      } else {
+        console.error('Webhook received but missing both uid and email in payload.');
       }
     }
 
