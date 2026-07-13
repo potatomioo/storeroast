@@ -17,7 +17,9 @@ const redis = new Redis({
 export async function POST(req: NextRequest) {
   try {
     // 1. IP Tracking & Authentication
-    const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
+    const forwardedFor = req.headers.get('x-forwarded-for');
+    const realIp = req.headers.get('x-real-ip');
+    const ip = req.ip || (forwardedFor ? forwardedFor.split(',')[0].trim() : (realIp || '127.0.0.1'));
     const authHeader = req.headers.get('authorization');
     let user = null;
 
@@ -33,8 +35,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    let isPaidRoast = false;
+
     if (!user) {
-      // Anonymous User -> Check Upstash
+      // Anonymous User -> Check Upstash limit by IP
       const tries = (await redis.get<number>(`tries:${ip}`)) || 0;
       if (tries >= 2) {
         return NextResponse.json({ error: 'LIMIT_REACHED' }, { status: 403 });
@@ -44,12 +48,16 @@ export async function POST(req: NextRequest) {
       if (adminDb) {
         const docRef = adminDb.collection('profiles').doc(user.uid);
         const docSnap = await docRef.get();
-        if (!docSnap.exists) {
-          return NextResponse.json({ error: 'OUT_OF_CREDITS' }, { status: 402 });
-        }
-        const profile = docSnap.data();
-        if (!profile || profile.credits <= 0) {
-          return NextResponse.json({ error: 'OUT_OF_CREDITS' }, { status: 402 });
+        const profile = docSnap.exists ? docSnap.data() : null;
+
+        if (profile && profile.credits > 0) {
+          isPaidRoast = true;
+        } else {
+          // Logged in but out of credits -> Give them 2 free tries tied to their UID
+          const tries = (await redis.get<number>(`tries:${user.uid}`)) || 0;
+          if (tries >= 2) {
+            return NextResponse.json({ error: 'LIMIT_REACHED' }, { status: 403 });
+          }
         }
       } else {
         return NextResponse.json({ error: 'Database unavailable' }, { status: 500 });
@@ -160,10 +168,7 @@ Return ONLY valid JSON — no markdown:
     const roastJson = JSON.parse(roastText);
 
     // 4. Charge the user or increment free tries
-    if (!user) {
-      const tries = (await redis.get<number>(`tries:${ip}`)) || 0;
-      await redis.set(`tries:${ip}`, tries + 1);
-    } else if (adminDb) {
+    if (isPaidRoast && adminDb && user) {
       const docRef = adminDb.collection('profiles').doc(user.uid);
       const docSnap = await docRef.get();
       if (docSnap.exists) {
@@ -172,6 +177,11 @@ Return ONLY valid JSON — no markdown:
           await docRef.update({ credits: profile.credits - 1 });
         }
       }
+    } else {
+      // Increment free try limit
+      const identifier = user ? user.uid : ip;
+      const tries = (await redis.get<number>(`tries:${identifier}`)) || 0;
+      await redis.set(`tries:${identifier}`, tries + 1);
     }
 
     return NextResponse.json({ success: true, data: roastJson, type: appData.type, screenshots: ('screenshots' in appData ? appData.screenshots : []) || [] });
