@@ -1,14 +1,15 @@
 import React from 'react';
 import { LogOut, Coins } from 'lucide-react';
+import Link from 'next/link';
 
 export default function Header({ session, credits, onLogout, onGetStarted }: { session?: any, credits?: number, onLogout?: () => void, onGetStarted?: () => void }) {
   return (
     <header className="w-full max-w-6xl py-8 px-6 flex items-center justify-between z-10">
-      <div className="font-bold text-2xl tracking-tight cursor-pointer" onClick={() => window.location.reload()}>StoreRoast</div>
-      
+      <div className="font-bold text-2xl tracking-tight cursor-pointer" onClick={() => window.location.href = '/'}>StoreRoast</div>
+
       <div className="flex items-center gap-6">
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-500">
-          <a href="#pricing" className="hover:text-black transition-colors">Pricing</a>
+        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-black">
+          <Link href="/pricing" className="hover:text-black transition-colors">Pricing</Link>
         </nav>
 
         {session ? (

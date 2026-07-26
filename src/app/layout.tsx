@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
+import { Outfit, Kalam } from "next/font/google";
 import "./globals.css";
 import { Toaster } from 'react-hot-toast';
+import CursorGlow from "@/components/layout/CursorGlow";
 
 const outfit = Outfit({
   variable: "--font-outfit",
+  subsets: ["latin"],
+});
+
+const kalam = Kalam({
+  weight: ['400', '700'],
+  variable: "--font-kalam",
   subsets: ["latin"],
 });
 
@@ -21,13 +28,38 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${outfit.variable} h-full antialiased`}
+      className={`${outfit.variable} ${kalam.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans relative overflow-x-hidden">
-        {/* Subtle background glow effect matching the AI pink/purple theme */}
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-200/30 blur-[120px] pointer-events-none -z-10" />
-        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-200/30 blur-[120px] pointer-events-none -z-10" />
-        <Toaster position="top-center" />
+        <CursorGlow />
+        {/* Sleek monochrome background styling - removing old gradients */}
+        <div className="fixed inset-0 bg-[url('/noise.png')] opacity-[0.02] pointer-events-none -z-20 mix-blend-overlay" />
+        <Toaster  
+          position="top-center" 
+          toastOptions={{
+            style: {
+              background: 'white',
+              color: '#333',
+              boxShadow: '0 10px 40px -10px rgba(0,0,0,0.15)',
+              borderRadius: '20px',
+              padding: '16px 24px',
+              fontSize: '15px',
+              fontWeight: 600,
+            },
+            success: {
+              iconTheme: {
+                primary: '#10b981',
+                secondary: 'white',
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: 'white',
+              },
+            },
+          }} 
+        />
         {children}
       </body>
     </html>

@@ -16,6 +16,17 @@ export default function PricingPage() {
   const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
+    // Clean up generic Dodo redirect parameters if present
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('payment_id')) {
+      if (urlParams.get('status') === 'succeeded') {
+        toast.success("Payment successful! Credits added.");
+      } else {
+        toast.error("Payment failed or was cancelled.");
+      }
+      window.location.replace(window.location.pathname);
+    }
+
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setSession(user);
       if (user) {
@@ -63,7 +74,7 @@ export default function PricingPage() {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          return_url: window.location.origin // Redirect to home so the toast shows up
+          return_url: window.location.href
         })
       });
       const data = await res.json();

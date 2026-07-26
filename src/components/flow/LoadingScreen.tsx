@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { WanderingEyes } from "@/components/loading-ui/wandering-eyes";
 
 const MESSAGES = [
-  "Reading your description...",
-  "Counting how many times you said 'easy to use'...",
-  "Judging your screenshots...",
-  "Reading your 2-star reviews...",
-  "Preparing the roast... 🔥",
-  "Almost there, the AI is being extra brutal...",
+  { text: "Judging your color palette...", highlight: "color palette" },
+  { text: "Finding every typo you missed...", highlight: "missed" },
+  { text: "Questioning your life choices...", highlight: "life choices" },
+  { text: "Calculating the exact moment users bounce...", highlight: "bounce" },
+  { text: "Preparing the brutal truth...", highlight: "brutal truth" },
 ];
 
 export default function LoadingScreen() {
@@ -21,19 +21,27 @@ export default function LoadingScreen() {
     return () => clearInterval(interval);
   }, []);
 
+  const msg = MESSAGES[index];
+  const parts = msg.text.split(msg.highlight);
+
   return (
-    <div className="w-full flex flex-col items-center justify-center min-h-[60vh] z-10">
-      <div className="w-16 h-16 rounded-full border-4 border-gray-100 border-t-purple-500 animate-spin mb-8" />
-      <div className="h-12 relative overflow-hidden w-full max-w-md flex justify-center items-center">
+    <div className="w-full flex flex-col items-center justify-center min-h-[60vh] z-10 p-4">
+      <WanderingEyes className="h-20 w-[180px] mb-8" />
+      <div className="h-16 relative overflow-visible w-full max-w-lg flex justify-center items-center">
         <AnimatePresence mode="wait">
           <motion.p
             key={index}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="text-xl font-medium text-gray-700 text-center absolute"
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.3 }}
+            className="text-2xl md:text-3xl font-handwriting font-bold text-gray-500 text-center absolute leading-relaxed"
           >
-            ⏳ {MESSAGES[index]}
+            {parts[0]}
+            <span className="bg-[var(--primary-yellow)] text-black px-2 py-0.5 mx-1 font-black shadow-sm -rotate-2 inline-block">
+              {msg.highlight}
+            </span>
+            {parts[1]}
           </motion.p>
         </AnimatePresence>
       </div>
