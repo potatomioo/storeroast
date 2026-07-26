@@ -1,15 +1,28 @@
 import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Share2, ArrowLeft, Download } from 'lucide-react';
+import { Lock, Share2, ArrowLeft, ShieldCheck, Zap, Award, XCircle, ArrowDown } from 'lucide-react';
 import * as htmlToImage from 'html-to-image';
 
 export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: { roastData: any, onPaid: () => void, onBack: () => void, isPaidUser: boolean }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isSharing, setIsSharing] = useState(false);
 
-  const roasts = roastData.roasts || [];
-  const freeRoasts = isPaidUser ? roasts : roasts.slice(0, 2);
-  const lockedRoasts = isPaidUser ? [] : (roasts.length > 2 ? roasts.slice(2) : []);
+  const cert = roastData.share_certificate;
+  const rep = roastData.report;
+
+  // Fallback if data is not using the new certificate-first schema
+  if (!cert || !cert.roast_pointers) {
+    return (
+      <div className="w-full max-w-4xl flex flex-col items-center mt-8 mb-8 z-10 px-4">
+        <button onClick={onBack} className="flex items-center gap-2 text-gray-500 hover:text-black font-medium transition-colors mb-6 self-start">
+          <ArrowLeft className="w-4 h-4" /> Roast Another
+        </button>
+        <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-200 mb-8 font-medium text-sm text-center w-full max-w-lg">
+          This is a legacy report. Please run a new roast to see the new minimalist format.
+        </div>
+      </div>
+    );
+  }
 
   const handleShare = async () => {
     if (!cardRef.current) return;
@@ -17,20 +30,18 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
     try {
       const imageUrl = await htmlToImage.toPng(cardRef.current, {
         pixelRatio: 2,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff', // Clean white for export
       });
-      
-      // Auto download
+
       const link = document.createElement('a');
-      link.download = 'app-roast.png';
+      link.download = 'storeroast-certificate.png';
       link.href = imageUrl;
       link.click();
-      
-      // Open X with pre-filled text
+
       const tweet = encodeURIComponent(
-        `AI just roasted my app listing 💀\n\nScore: ${roastData.score}/10\n\n"${roastData.headline}"\n\nGet yours roasted free → storeroast.live\n\n#buildinpublic #indiedev`
+        `My product just got roasted by AI 💀\n\n"${cert.main_roast_headline}"\n\nGet your certificate of failure free → storeroast.live\n\n#buildinpublic`
       );
-      
+
       setTimeout(() => {
         window.open(`https://twitter.com/intent/tweet?text=${tweet}`, '_blank');
         setIsSharing(false);
@@ -41,130 +52,224 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
     }
   };
 
+  const screenshots = roastData.screenshots || [];
+  const isWeb = roastData.type === 'website';
+
+  // Filter pointers for free mode (skip visual/competitor)
+  const displayPointers = isPaidUser ? cert.roast_pointers : cert.roast_pointers.slice(0, 2);
+  const displayReportPointers = isPaidUser ? rep.pointers : (rep.pointers || []).slice(0, 2);
+
   return (
-    <div className="w-full max-w-4xl flex flex-col items-center mt-8 mb-32 z-10">
-      
-      <div className="w-full flex justify-between items-center mb-6 px-4">
+    <div className="w-full max-w-4xl flex flex-col items-center mt-2 mb-8 z-10 px-4 md:px-0">
+
+      {/* Top Bar */}
+      <div className="w-full flex justify-between items-center mb-12">
         <button onClick={onBack} className="flex items-center gap-2 text-gray-500 hover:text-black font-medium transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Roast Another App
+          <ArrowLeft className="w-4 h-4" /> Roast Another
         </button>
-        <button onClick={handleShare} disabled={isSharing} className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50">
-          {isSharing ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Share2 className="w-4 h-4" />}
-          {isSharing ? 'Generating...' : 'Share on X'}
-        </button>
+
+        <div className="flex items-center gap-3">
+          {!isPaidUser && (
+            <button onClick={onPaid} className="hidden md:flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-950 px-5 py-2.5 rounded-full text-sm font-bold hover:brightness-110 transition-all shadow-md">
+              <Award className="w-4 h-4" /> Get Verified Visual Ticket
+            </button>
+          )}
+          <button onClick={handleShare} disabled={isSharing} className="flex items-center gap-2 bg-black text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-gray-800 transition-transform hover:scale-105 disabled:opacity-50 shadow-md">
+            {isSharing ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Share2 className="w-4 h-4" />}
+            {isSharing ? 'Generating...' : 'Share on X'}
+          </button>
+        </div>
       </div>
 
-      {/* The Report Card (This Div gets captured by html2canvas) */}
-      <motion.div 
-        ref={cardRef} 
-        initial={{ opacity: 0, y: 20 }} 
-        animate={{ opacity: 1, y: 0 }} 
-        className="w-full bg-[#fdfbf7] rounded-none border-4 border-double border-gray-900 p-8 md:p-12 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] mb-8 font-serif"
+      {/* =========================================
+          THE NEW STICKY NOTE / TICKET CERTIFICATE
+          ========================================= */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        className="w-full flex justify-center mb-16 relative"
       >
-        <div className="flex flex-col items-center text-center mb-8 pb-8 border-b-2 border-black border-dashed">
-          <div className="font-bold tracking-[0.2em] text-gray-500 uppercase text-xs mb-2">Official Document</div>
-          <h1 className="text-4xl md:text-5xl font-black text-black tracking-tight mb-6 uppercase">Roast Report</h1>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 italic mb-6">"{roastData.headline}"</h2>
-          <div className="flex flex-col items-center bg-white border-2 border-black p-4 rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-             <div className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">Final Grade</div>
-             <div className="flex items-baseline gap-2">
-               <div className="text-6xl font-black text-red-600 leading-none">{roastData.score}</div>
-               <div className="text-2xl font-bold text-gray-400">/ 10</div>
-             </div>
+        <div
+          ref={cardRef}
+        // className="w-full max-w-5xl bg-[#0f0f0f] md:min-h-[600px] rounded-xl p-8 md:p-16 relative overflow-hidden flex flex-col items-center justify-center shadow-2xl"
+        >
+
+          {/* THE SINGLE WIDE STICKY NOTE */}
+          <div
+            className="relative w-full max-w-2xl px-8 py-12 md:px-16 md:py-16 shadow-[0px_0px_20px_rgba(0,0,0,0.5)] z-20 flex flex-col rounded-t-sm pb-16"
+            style={{
+              backgroundImage: "radial-gradient(circle at 15px 100%, transparent 10px, var(--primary-yellow) 10.5px)",
+              backgroundSize: "30px 100%",
+              backgroundRepeat: "repeat-x",
+              backgroundColor: "transparent"
+            }}
+          >
+            {/* The Tape */}
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-40 h-10 bg-white/40 backdrop-blur-sm -rotate-1 shadow-sm z-30" style={{ clipPath: 'polygon(5% 0%, 95% 2%, 100% 100%, 0% 98%)' }} />
+
+            {/* Ticket Header */}
+            <div className="flex justify-between items-start mb-8 md:mb-10 relative z-10">
+              <div className="text-sm font-bold text-black opacity-80">StoreRoast</div>
+
+              {/* Verified Stamp */}
+              {isPaidUser && cert.verified_badge && (
+                <div className="absolute top-0 right-0 md:top-2 md:-right-4 rotate-3 border-2 border-red-600 text-red-600 px-2 py-0.5 text-[10px] md:text-xs font-black uppercase tracking-widest rounded-sm opacity-80 mix-blend-multiply shadow-sm">
+                  VERIFIED ROAST
+                </div>
+              )}
+            </div>
+
+            {/* Embedded Screenshots (Paid Only) at the top */}
+            {isPaidUser && screenshots.length > 0 && (
+              <div className="w-full flex flex-col items-center mb-8">
+                {isWeb ? (
+                  <div className="w-full flex justify-center items-center">
+                    <div
+                      className="w-full aspect-[16/9] rounded-xl overflow-hidden border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white z-20"
+                      style={{ backgroundImage: `url('${screenshots[0]}')`, backgroundSize: 'cover', backgroundPosition: 'top' }}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-full flex justify-center gap-4 md:gap-6 z-20">
+                    {screenshots.slice(0, 3).map((src: string, i: number) => (
+                      <div
+                        key={i}
+                        className="flex-1 aspect-[9/16] rounded-xl overflow-hidden border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white"
+                        style={{
+                          backgroundImage: `url('${src}')`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'top'
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* App Name */}
+            <h1 className={`font-handwriting font-bold tracking-tighter text-black leading-[0.9] ${isPaidUser ? 'text-5xl md:text-6xl mb-6' : 'text-6xl md:text-8xl mb-8'}`}>
+              {cert.product_name}
+            </h1>
+
+            {/* Main Savage Headline */}
+            <div className={`w-full ${isPaidUser ? 'mb-6' : 'mb-8'}`}>
+              <p className={`${isPaidUser ? 'text-3xl md:text-4xl' : 'text-4xl md:text-5xl'} font-handwriting text-red-600 leading-tight`}>
+                "{cert.main_roast_headline}"
+              </p>
+              <div className="h-0.5 w-full bg-black/10 mt-6 rounded-full" />
+            </div>
+
+            {/* Pointers Section */}
+            <div className="mb-4">
+              <div className="text-sm font-handwriting text-black/70 mb-4">Why we roasted:</div>
+              <div className="space-y-3">
+                {displayPointers.map((pointer: any, i: number) => {
+                  const text = typeof pointer === 'string' ? pointer : pointer.text;
+                  const highlight = typeof pointer === 'string' ? null : pointer.highlight;
+
+                  const isCompetitor = isPaidUser && i === 2; // The 3rd pointer is the competitor pointer in paid mode
+
+                  return (
+                    <div key={i} className="flex items-start gap-3">
+                      <span className={`font-handwriting ${isPaidUser ? 'text-base md:text-lg' : 'text-lg md:text-xl'} text-black font-bold shrink-0 mt-0.5`}>x</span>
+                      <span className={`font-handwriting ${isPaidUser ? 'text-base md:text-lg' : 'text-lg md:text-xl'} text-gray-900 leading-snug`}>
+                        {highlight && text.includes(highlight) ? (
+                          <>
+                            {text.split(highlight)[0]}
+                            {isCompetitor ? (
+                              <span className="bg-red-600 text-white px-2 py-0.5 mx-1 font-bold inline-block rotate-1 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] rounded-md uppercase tracking-wider text-xs md:text-sm">{highlight}</span>
+                            ) : (
+                              <span className="bg-black text-white px-2 py-0.5 mx-1 font-bold inline-block -rotate-1 shadow-sm">{highlight}</span>
+                            )}
+                            {text.split(highlight)[1]}
+                          </>
+                        ) : (
+                          text
+                        )}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Smiley doodle */}
+            <div className="absolute bottom-6 right-8 opacity-40 mt-auto">
+              <svg width="24" height="24" viewBox="0 0 100 100" fill="none" stroke="black" strokeWidth="4" strokeLinecap="round">
+                <circle cx="50" cy="50" r="40" />
+                <path d="M35 40 v10 M65 40 v10" />
+                <path d="M35 65 Q 50 80 65 65" />
+              </svg>
+            </div>
           </div>
-        </div>
 
-        <div className="space-y-8">
-          {freeRoasts.map((item: any, idx: number) => (
-            <div key={idx} className="relative border-l-4 border-red-500 pl-6 py-2">
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-black text-lg uppercase tracking-wider">{item.category}</span>
-                <span className="bg-black text-white px-3 py-1 rounded font-bold text-sm">{item.score}/10</span>
-              </div>
-              <p className="text-lg text-gray-800 mb-3 font-medium italic">"{item.roast}"</p>
-              <div className="bg-red-50 p-4 border border-red-200 text-red-900 font-sans text-sm font-medium">
-                <strong className="text-red-700 font-bold uppercase mr-2">Correction:</strong> {item.fix}
-              </div>
-            </div>
-          ))}
-
-          {isPaidUser && roastData.screenshots && roastData.screenshots.length > 0 && (
-            <div className="mt-12 border-t-2 border-gray-200 pt-8">
-              <h4 className="text-lg font-black uppercase tracking-widest mb-6 text-center">Visual Evidence</h4>
-              <div className="flex gap-4 overflow-x-auto pb-4 snap-x justify-center">
-                {roastData.screenshots.map((url: string, i: number) => (
-                  <img key={i} src={url} alt={`Screenshot ${i+1}`} className="h-64 object-contain border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] snap-center bg-white p-2" crossOrigin="anonymous" />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {isPaidUser && roastData.better_student && (
-             <div className="mt-8 border-2 border-blue-900 bg-blue-50 p-6 shadow-[6px_6px_0px_0px_rgba(30,58,138,1)]">
-               <div className="flex items-center justify-between mb-4 border-b border-blue-200 pb-2">
-                 <h4 className="text-blue-900 font-black uppercase tracking-wider">The "Better Student"</h4>
-                 <span className="bg-blue-900 text-white px-3 py-1 text-xs font-bold uppercase rounded">Class Benchmark</span>
-               </div>
-               <p className="text-blue-800 font-bold text-xl italic mb-2">{roastData.better_student.app_name}</p>
-               <p className="text-blue-900 font-medium font-sans leading-relaxed">{roastData.better_student.roast}</p>
-             </div>
-          )}
-
-          {isPaidUser && roastData.verdict && (
-             <div className="mt-8 border-t-2 border-black pt-8">
-               <h4 className="font-black uppercase tracking-widest mb-3 text-red-600">Principal's Remarks</h4>
-               <p className="text-xl font-medium leading-relaxed">"{roastData.verdict}"</p>
-             </div>
-          )}
-          
-          {isPaidUser && roastData.fix_today && (
-             <div className="mt-8 p-6 bg-black text-white shadow-[6px_6px_0px_0px_rgba(239,68,68,1)]">
-               <h4 className="text-red-500 font-black uppercase tracking-widest mb-2">Mandatory Homework</h4>
-               <p className="text-lg font-bold font-sans">{roastData.fix_today}</p>
-             </div>
-          )}
-
-          {/* Teacher Signature */}
-          <div className="mt-16 pt-8 border-t border-gray-300 flex justify-end">
-            <div className="flex flex-col items-center">
-               <div className="font-serif text-3xl text-gray-800 italic" style={{ fontFamily: 'var(--font-outfit), cursive' }}>StoreRoast.live</div>
-               <div className="w-48 h-px bg-black mt-2 mb-1"></div>
-               <div className="text-xs uppercase tracking-widest font-bold text-gray-500">Authorized Signature</div>
-            </div>
-          </div>
         </div>
       </motion.div>
 
-      {/* Blurred / Locked Section Logic */}
-      {!isPaidUser && lockedRoasts.length > 0 && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="w-full relative overflow-hidden rounded-3xl mt-4">
-          <div className="absolute inset-0 z-10 backdrop-blur-md bg-white/70 flex flex-col items-center justify-center border-2 border-gray-200 rounded-3xl">
-            <div className="bg-white p-8 rounded-2xl shadow-2xl flex flex-col items-center text-center max-w-md border border-gray-100">
-              <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-6">
-                <Lock className="w-8 h-8 text-white" />
+
+      {/* =========================================
+          DIVIDER
+          ========================================= */}
+      <div className="w-full flex flex-col items-center justify-center mb-16 opacity-50">
+        <ArrowDown className="w-6 h-6 text-gray-400 mb-4 animate-bounce" />
+        <div className="text-sm font-bold tracking-widest uppercase text-gray-500">View Detailed Breakdown</div>
+      </div>
+
+      {/* =========================================
+          MINIMALIST REPORT SECTION (2-Line Explanations)
+          ========================================= */}
+      <div className="w-full max-w-3xl mb-8">
+        <div className="space-y-6 mb-12">
+          {displayReportPointers && displayReportPointers.map((pointer: any, i: number) => (
+            <div key={i} className="bg-white border-2 border-black p-6 md:p-8 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col">
+              <div className="text-sm font-black uppercase tracking-widest text-black/40 mb-3 font-handwriting">{pointer.title}</div>
+              <p className="text-lg md:text-xl font-bold text-black mb-6 leading-relaxed font-handwriting">
+                "{pointer.roast}"
+              </p>
+              <div className="flex items-center gap-3 bg-[var(--primary-yellow)]/20 px-5 py-4 rounded-xl border-2 border-black mt-auto">
+                <Zap className="w-5 h-5 text-black shrink-0" />
+                <span className="text-base font-bold text-black">Fix: {pointer.fix}</span>
               </div>
-              <h3 className="text-2xl font-black text-gray-900 mb-2">
-                Unlock the rest of the roast
-              </h3>
-              <p className="text-gray-500 mb-8 font-medium">Get the remaining roasts, the brutal final verdict, and the actionable fix plan.</p>
-              <button 
-                onClick={onPaid}
-                className="bg-black text-white px-8 py-3.5 rounded-full font-bold hover:bg-gray-800 transition-all shadow-lg w-full transform hover:scale-105"
-              >
-                Unlock Report Card — 1 Credit
-              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* =========================================
+            FREE FLOW PAYWALL
+            ========================================= */}
+        {!isPaidUser && (
+          <div className="relative mt-8">
+            <div className="bg-white border-4 border-black rounded-3xl p-10 md:p-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative z-20 text-center md:text-left flex flex-col md:flex-row items-center gap-10">
+              <div className="flex-1">
+                <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
+                  <Lock className="w-6 h-6 text-black" />
+                  <h4 className="text-3xl font-black text-black uppercase tracking-tight font-handwriting">Unlock Deep Roast</h4>
+                </div>
+                <p className="text-black/70 font-bold mb-8 text-lg font-handwriting">You've only seen the tip of the iceberg. Unlock the verified ticket and full pointer breakdown.</p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 md:mb-0">
+                  {['Verified Social Badge', 'Competitor Benchmark Pointer', 'UI/UX Visual Roast', 'More Fixes'].map((feature, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-full bg-black text-[var(--primary-yellow)] flex items-center justify-center shrink-0">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>
+                      </div>
+                      <span className="text-sm font-bold text-black font-handwriting">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="w-full md:w-64 shrink-0">
+                <button onClick={onPaid} className="w-full bg-black text-white py-5 px-6 rounded-2xl font-bold text-lg hover:bg-gray-800 active:translate-y-1 active:shadow-none transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
+                  <span>Unlock Now</span>
+                  <span className="text-xs font-bold text-white/50 mt-1">1 Credit</span>
+                </button>
+              </div>
             </div>
           </div>
+        )}
 
-          <div className="w-full bg-gray-50 rounded-3xl border-2 border-gray-200 p-8 md:p-12 blur-md opacity-40 select-none">
-            <div className="space-y-12">
-              <div className="h-20 bg-gray-300 rounded-lg w-full"></div>
-              <div className="h-20 bg-gray-300 rounded-lg w-full"></div>
-            </div>
-          </div>
-        </motion.div>
-      )}
-
+      </div>
     </div>
   );
 }
