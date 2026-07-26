@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 
 export function WanderingEyes({ className }: { className?: string }) {
-  const eyeVariants = {
+  const eyeVariants: any = {
     move: {
       x: ["-25%", "45%", "-40%", "25%", "0%"],
       y: ["-25%", "35%", "15%", "-35%", "0%"],
