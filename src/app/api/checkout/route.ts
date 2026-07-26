@@ -4,7 +4,6 @@ import { adminAuth } from '@/utils/firebaseAdmin';
 
 const client = new DodoPayments({
   bearerToken: process.env.DODO_PAYMENTS_API_KEY || 'dummy',
-  // Force test mode while we are testing, regardless of Vercel NODE_ENV
   environment: 'test_mode',
 });
 

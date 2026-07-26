@@ -20,11 +20,15 @@ export async function scrapeWebsite(url: string) {
       if (text.length > 5) textBlocks.push(text);
     });
     
+    // Generate a screenshot URL using Thum.io (free, no-auth public API)
+    const screenshotUrl = `https://image.thum.io/get/width/1200/crop/800/${formattedUrl}`;
+    
     return {
       type: 'website',
       title,
       description,
-      visibleText: textBlocks.slice(0, 20).join('\n') // Limit to first 20 meaningful blocks to save tokens
+      visibleText: textBlocks.slice(0, 20).join('\n'), // Limit to first 20 meaningful blocks to save tokens
+      screenshots: [screenshotUrl]
     };
   } catch (e) {
     throw new Error('Failed to scrape website. Ensure the URL is accessible.');
