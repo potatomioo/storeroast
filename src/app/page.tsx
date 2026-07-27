@@ -7,6 +7,7 @@ import Hero from "@/components/home/Hero";
 import Features from "@/components/home/Features";
 import FooterCTA from "@/components/layout/FooterCTA";
 import LoadingScreen from "@/components/flow/LoadingScreen";
+import ResultTeaser from "@/components/flow/ResultTeaser";
 import LoginCard from "@/components/auth/LoginCard";
 import { UploadCloud, Sparkles, AlertCircle, FileText, Smartphone, Globe, Share2, Lock, Unlock, PlayCircle, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,13 +16,14 @@ import { onAuthStateChanged, isSignInWithEmailLink, signInWithEmailLink, signOut
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 
-type AppState = 'IDLE' | 'LOADING';
+type AppState = 'IDLE' | 'LOADING' | 'RESULT';
 
 export default function Home() {
   const router = useRouter();
   const [appState, setAppState] = useState<AppState>('IDLE');
   const [appUrl, setAppUrl] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [freeRoastData, setFreeRoastData] = useState<any>(null);
   
   // Auth & Credits State
   const [session, setSession] = useState<User | null>(null);
@@ -135,6 +137,9 @@ export default function Home() {
       
       if (data.reportId) {
         router.push(`/report/${data.reportId}`);
+      } else {
+        setFreeRoastData(data.data);
+        setAppState('RESULT');
       }
     } catch (err: any) {
       setError(err.message);
@@ -156,6 +161,13 @@ export default function Home() {
         </>
       ) : appState === 'LOADING' ? (
         <LoadingScreen />
+      ) : appState === 'RESULT' && freeRoastData ? (
+        <ResultTeaser 
+          roastData={freeRoastData} 
+          onPaid={() => router.push('/pricing')} 
+          onBack={() => setAppState('IDLE')} 
+          isPaidUser={false} 
+        />
       ) : null}
       
       <FooterCTA />

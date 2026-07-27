@@ -74,7 +74,7 @@ export default function PricingPage() {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          return_url: window.location.href
+          return_url: window.location.origin + '?payment=success'
         })
       });
       const data = await res.json();

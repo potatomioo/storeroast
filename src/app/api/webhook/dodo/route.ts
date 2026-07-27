@@ -57,20 +57,19 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ received: true, skipped: true });
           }
 
-          // We use adminDb.FieldValue for array operations but we can also just append in JS safely
           await docRef.update({ 
-            credits: currentCredits + 15,
+            credits: currentCredits + 10,
             processed_payments: [...processedPayments, paymentId]
           });
-          console.log(`Successfully added 15 credits to uid: ${uid}`);
+          console.log(`Successfully added 10 credits to uid: ${uid}`);
         } else {
           // If profile doc doesn't exist for some reason, create it
           await docRef.set({ 
             email: email || 'unknown', 
-            credits: 15,
+            credits: 10,
             processed_payments: [paymentId]
           });
-          console.log(`Created profile and added 15 credits to uid: ${uid}`);
+          console.log(`Created profile and added 10 credits to uid: ${uid}`);
         }
       } else if (email) {
         // Fallback: Query by email if uid is somehow missing
@@ -90,10 +89,10 @@ export async function POST(req: NextRequest) {
           }
 
           await doc.ref.update({ 
-            credits: currentCredits + 15,
+            credits: currentCredits + 10,
             processed_payments: [...processedPayments, paymentId]
           });
-          console.log(`Fallback: Successfully added 15 credits to email: ${email}`);
+          console.log(`Fallback: Successfully added 10 credits to email: ${email}`);
         } else {
           console.error(`Profile not found for email: ${email} and no uid provided.`);
         }

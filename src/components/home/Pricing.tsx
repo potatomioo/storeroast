@@ -38,7 +38,7 @@ export default function Pricing({ onBuy, isLoggedIn }: { onBuy?: () => void, isL
           </div>
           <div className="text-[10px] font-bold tracking-widest uppercase bg-white text-black px-3 py-1 rounded-md w-fit mb-6 shadow-sm">PREMIUM</div>
           <h3 className="text-3xl font-black text-black mb-2 tracking-tight font-handwriting">Total Obliteration</h3>
-          <p className="text-sm text-black/70 mb-8 font-medium">Stop guessing why users bounce. Unlock the brutally honest truth and 15 full roasts.</p>
+          <p className="text-sm text-black/70 mb-8 font-medium">Stop guessing why users bounce. Unlock the brutally honest truth and 10 full roasts.</p>
           
           <div className="flex items-end gap-1 mb-8 text-black">
             <div className="text-6xl font-black tracking-tighter font-handwriting">$1.99</div>
@@ -46,7 +46,7 @@ export default function Pricing({ onBuy, isLoggedIn }: { onBuy?: () => void, isL
           </div>
           
           <ul className="space-y-4 mb-10 flex-1">
-            <li className="flex items-center gap-3 text-sm font-bold text-black"><Check className="w-4 h-4 text-black" /> 15 Full Deep Roasts</li>
+            <li className="flex items-center gap-3 text-sm font-bold text-black"><Check className="w-4 h-4 text-black" /> 10 Full Deep Roasts</li>
             <li className="flex items-center gap-3 text-sm font-bold text-black"><Check className="w-4 h-4 text-black" /> Visual Screenshot Evidence</li>
             <li className="flex items-center gap-3 text-sm font-bold text-black"><Check className="w-4 h-4 text-black" /> Competitor Benchmarking</li>
             <li className="flex items-center gap-3 text-sm font-bold text-black"><Check className="w-4 h-4 text-black" /> Expanded Brutal Explanations</li>
@@ -57,7 +57,7 @@ export default function Pricing({ onBuy, isLoggedIn }: { onBuy?: () => void, isL
               onClick={onBuy}
               className="w-full bg-black text-white rounded-lg py-4 font-black text-sm uppercase tracking-wider hover:bg-gray-800 transition-transform shadow-lg"
             >
-              {isLoggedIn ? 'Buy 15 Credits ($0.01 Test)' : 'Sign In to Buy'}
+              {isLoggedIn ? 'Buy 10 Credits ($1.99)' : 'Sign In to Buy'}
             </button>
           )}
         </div>

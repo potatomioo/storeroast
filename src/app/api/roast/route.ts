@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { Redis } from '@upstash/redis';
+import { Ratelimit } from '@upstash/ratelimit';
 import { scrapePlayStore } from '@/lib/scrapers/playStore';
 import { scrapeAppStore } from '@/lib/scrapers/appStore';
 import { scrapeWebsite } from '@/lib/scrapers/website';
@@ -10,6 +12,31 @@ import { buildDeepRoastPrompt } from '@/lib/prompts/deepRoast';
 export const maxDuration = 60;
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+// Initialize Redis and Rate Limiters
+let redis: Redis | null = null;
+let minuteLimit: Ratelimit | null = null;
+let dailyLimit: Ratelimit | null = null;
+
+try {
+  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    redis = Redis.fromEnv();
+    minuteLimit = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(2, "1 m"),
+      analytics: false,
+      prefix: "@upstash/ratelimit/minute"
+    });
+    dailyLimit = new Ratelimit({
+      redis,
+      limiter: Ratelimit.fixedWindow(10, "24 h"),
+      analytics: false,
+      prefix: "@upstash/ratelimit/daily"
+    });
+  }
+} catch (error) {
+  console.warn("Upstash Redis is not configured correctly. Rate limiting disabled.");
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -41,6 +68,25 @@ export async function POST(req: NextRequest) {
 
       if (profile && profile.credits > 0) {
         isPaidRoast = true;
+      }
+    }
+
+    // Apply Rate Limits
+    if (minuteLimit && dailyLimit) {
+      const identifier = user ? user.uid : ip;
+      
+      // 1. Minute Limit (applies to EVERYONE to protect Gemini quota)
+      const minuteCheck = await minuteLimit.limit(identifier);
+      if (!minuteCheck.success) {
+        return NextResponse.json({ error: 'Slow down 😅 You are roasting too fast! Please wait 60 seconds.' }, { status: 429 });
+      }
+
+      // 2. Daily Limit (applies ONLY to FREE users)
+      if (!isPaidRoast) {
+        const dailyCheck = await dailyLimit.limit(identifier);
+        if (!dailyCheck.success) {
+          return NextResponse.json({ error: 'You have reached your free daily limit! Upgrade for unlimited Deep Roasts.' }, { status: 429 });
+        }
       }
     }
 
@@ -121,22 +167,25 @@ export async function POST(req: NextRequest) {
 
     const screenshots = ('screenshots' in appData ? appData.screenshots : []) || [];
     
-    // Save report to Firestore
-    const roastDoc = {
-      type: appData.type,
-      url: url,
-      screenshots: screenshots,
-      roastData: roastJson,
-      isPaid: isPaidRoast,
-      createdAt: new Date().toISOString(),
-      userId: user ? user.uid : null,
-      ip: user ? null : ip
-    };
-    
     let reportId = null;
-    if (adminDb) {
-      const docRef = await adminDb.collection('reports').add(roastDoc);
-      reportId = docRef.id;
+
+    // ONLY save report to Firestore for PAID users to save database costs
+    if (isPaidRoast) {
+      const roastDoc = {
+        type: appData.type,
+        url: url,
+        screenshots: screenshots,
+        roastData: roastJson,
+        isPaid: isPaidRoast,
+        createdAt: new Date().toISOString(),
+        userId: user ? user.uid : null,
+        ip: user ? null : ip
+      };
+      
+      if (adminDb) {
+        const docRef = await adminDb.collection('reports').add(roastDoc);
+        reportId = docRef.id;
+      }
     }
 
     return NextResponse.json({ success: true, reportId, data: roastJson, type: appData.type, screenshots });

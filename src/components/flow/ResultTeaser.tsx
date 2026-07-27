@@ -38,8 +38,10 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
       link.href = imageUrl;
       link.click();
 
+      // Only paid users get a permanent link to share. Free users just share the text.
+      const urlToShare = isPaidUser ? window.location.href : 'https://storeroast.live';
       const tweet = encodeURIComponent(
-        `My product just got roasted by AI 💀\n\n"${cert.main_roast_headline}"\n\nGet your certificate of failure free → storeroast.live\n\n#buildinpublic`
+        `My product just got roasted by AI 💀\n\n"${cert.main_roast_headline}"\n\nGet your certificate of failure free → ${urlToShare}\n\n#buildinpublic`
       );
 
       setTimeout(() => {
@@ -58,6 +60,8 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
   // Filter pointers for free mode (skip visual/competitor)
   const displayPointers = isPaidUser ? cert.roast_pointers : cert.roast_pointers.slice(0, 2);
   const displayReportPointers = isPaidUser ? rep.pointers : (rep.pointers || []).slice(0, 2);
+
+  const themeColor = cert?.brand_color || 'var(--primary-yellow)';
 
   return (
     <div className="w-full max-w-4xl flex flex-col items-center mt-2 mb-8 z-10 px-4 md:px-0">
@@ -90,37 +94,48 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
       >
         <div
           ref={cardRef}
-        // className="w-full max-w-5xl bg-[#0f0f0f] md:min-h-[600px] rounded-xl p-8 md:p-16 relative overflow-hidden flex flex-col items-center justify-center shadow-2xl"
         >
 
           {/* THE SINGLE WIDE STICKY NOTE */}
           <div
-            className="relative w-full max-w-2xl px-8 py-12 md:px-16 md:py-16 shadow-[0px_0px_20px_rgba(0,0,0,0.5)] z-20 flex flex-col rounded-t-sm pb-16"
+            className="relative w-full max-w-2xl px-8 py-12 md:px-16 md:py-16 z-20 flex flex-col rounded-t-sm pb-16"
             style={{
-              backgroundImage: "radial-gradient(circle at 15px 100%, transparent 10px, var(--primary-yellow) 10.5px)",
+              backgroundImage: `radial-gradient(circle at 15px 100%, transparent 10px, ${themeColor} 10.5px)`,
               backgroundSize: "30px 100%",
               backgroundRepeat: "repeat-x",
-              backgroundColor: "transparent"
+              backgroundColor: "transparent",
+              boxShadow: "0px -10px 20px rgba(0,0,0,0.2)"
             }}
           >
             {/* The Tape */}
             <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-40 h-10 bg-white/40 backdrop-blur-sm -rotate-1 shadow-sm z-30" style={{ clipPath: 'polygon(5% 0%, 95% 2%, 100% 100%, 0% 98%)' }} />
 
+            {/* Coffee Stain Overlay (Subtle Handcrafted Detail) */}
+            <div className="absolute top-12 -right-8 w-40 h-40 opacity-10 mix-blend-multiply pointer-events-none rotate-45 rounded-full border-[6px] border-dashed border-amber-900 z-10" />
+
+            {/* Hand-drawn Star */}
+            <svg className="absolute top-8 left-8 w-8 h-8 opacity-40 -rotate-12 pointer-events-none z-10" viewBox="0 0 100 100" fill="none" stroke="black" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M50 10 L60 40 L90 40 L65 60 L75 90 L50 70 L25 90 L35 60 L10 40 L40 40 Z" />
+            </svg>
+
             {/* Ticket Header */}
-            <div className="flex justify-between items-start mb-8 md:mb-10 relative z-10">
+            <div className="flex justify-between items-start mb-8 md:mb-10 relative z-20">
               <div className="text-sm font-bold text-black opacity-80">StoreRoast</div>
 
               {/* Verified Stamp */}
               {isPaidUser && cert.verified_badge && (
-                <div className="absolute top-0 right-0 md:top-2 md:-right-4 rotate-3 border-2 border-red-600 text-red-600 px-2 py-0.5 text-[10px] md:text-xs font-black uppercase tracking-widest rounded-sm opacity-80 mix-blend-multiply shadow-sm">
-                  VERIFIED ROAST
+                <div className="relative">
+                  <div className="absolute -top-2 -right-2 w-full h-full border-2 border-red-600/30 rotate-6 rounded-sm" />
+                  <div className="rotate-3 border-2 border-red-600 text-red-600 px-2 py-0.5 text-[10px] md:text-xs font-black uppercase tracking-widest rounded-sm opacity-90 mix-blend-multiply shadow-sm bg-red-600/5">
+                    VERIFIED ROAST
+                  </div>
                 </div>
               )}
             </div>
 
             {/* Embedded Screenshots (Paid Only) at the top */}
             {isPaidUser && screenshots.length > 0 && (
-              <div className="w-full flex flex-col items-center mb-8">
+              <div className="w-full flex flex-col items-center mb-8 relative z-20">
                 {isWeb ? (
                   <div className="w-full flex justify-center items-center">
                     <div
@@ -146,22 +161,35 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
               </div>
             )}
 
-            {/* App Name */}
-            <h1 className={`font-handwriting font-bold tracking-tighter text-black leading-[0.9] ${isPaidUser ? 'text-5xl md:text-6xl mb-6' : 'text-6xl md:text-8xl mb-8'}`}>
-              {cert.product_name}
-            </h1>
+            {/* App Name with Marker Underline */}
+            <div className="relative inline-block mb-8 self-start z-20">
+              <h1 className={`font-handwriting font-bold tracking-tighter text-black leading-[0.9] relative z-10 ${isPaidUser ? 'text-5xl md:text-6xl' : 'text-6xl md:text-8xl'}`}>
+                {cert.product_name}
+              </h1>
+              {/* Handwritten Underline */}
+              <svg className="absolute -bottom-2 left-0 w-full h-4 text-black opacity-80 z-0" viewBox="0 0 100 20" preserveAspectRatio="none">
+                <path d="M 5,10 Q 30,5 50,15 T 95,10" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+              </svg>
+            </div>
 
-            {/* Main Savage Headline */}
-            <div className={`w-full ${isPaidUser ? 'mb-6' : 'mb-8'}`}>
-              <p className={`${isPaidUser ? 'text-3xl md:text-4xl' : 'text-4xl md:text-5xl'} font-handwriting text-red-600 leading-tight`}>
+            {/* Main Savage Headline with Hand-drawn Arrow */}
+            <div className={`w-full relative z-20 ${isPaidUser ? 'mb-6' : 'mb-8'}`}>
+              {/* Handwritten "Ouch" Annotation */}
+              <div className="absolute -top-8 -right-4 md:-right-8 text-red-600 font-handwriting font-bold text-xl rotate-12 flex flex-col items-center">
+                <span>Oof.</span>
+                <svg className="w-6 h-6 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M12 4v16m0 0l-4-4m4 4l4-4" />
+                </svg>
+              </div>
+
+              <p className={`${isPaidUser ? 'text-3xl md:text-4xl' : 'text-4xl md:text-5xl'} font-handwriting text-red-600 leading-tight font-bold italic`}>
                 "{cert.main_roast_headline}"
               </p>
               <div className="h-0.5 w-full bg-black/10 mt-6 rounded-full" />
             </div>
 
             {/* Pointers Section */}
-            <div className="mb-4">
-              <div className="text-sm font-handwriting text-black/70 mb-4">Why we roasted:</div>
+            <div className="mb-4 relative z-20">
               <div className="space-y-3">
                 {displayPointers.map((pointer: any, i: number) => {
                   const text = typeof pointer === 'string' ? pointer : pointer.text;
@@ -170,16 +198,26 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
                   const isCompetitor = isPaidUser && i === 2; // The 3rd pointer is the competitor pointer in paid mode
 
                   return (
-                    <div key={i} className="flex items-start gap-3">
-                      <span className={`font-handwriting ${isPaidUser ? 'text-base md:text-lg' : 'text-lg md:text-xl'} text-black font-bold shrink-0 mt-0.5`}>x</span>
+                    <div key={i} className="flex items-start gap-3 relative">
+                      <span className={`font-handwriting ${isPaidUser ? 'text-base md:text-lg' : 'text-lg md:text-xl'} text-black font-black shrink-0 mt-0.5`}>x</span>
                       <span className={`font-handwriting ${isPaidUser ? 'text-base md:text-lg' : 'text-lg md:text-xl'} text-gray-900 leading-snug`}>
                         {highlight && text.includes(highlight) ? (
                           <>
                             {text.split(highlight)[0]}
                             {isCompetitor ? (
-                              <span className="bg-red-600 text-white px-2 py-0.5 mx-1 font-bold inline-block rotate-1 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] rounded-md uppercase tracking-wider text-xs md:text-sm">{highlight}</span>
+                              <span className="relative inline-block mx-1">
+                                {/* Hand-drawn Red Circle around Competitor */}
+                                <svg className="absolute -inset-1.5 w-[calc(100%+12px)] h-[calc(100%+12px)] text-red-600 opacity-90 z-0 pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                                  <ellipse cx="50" cy="50" rx="45" ry="35" transform="rotate(-3 50 50)" />
+                                </svg>
+                                <span className="relative z-10 font-bold px-1 uppercase tracking-tight text-red-700">{highlight}</span>
+                              </span>
                             ) : (
-                              <span className="bg-black text-white px-2 py-0.5 mx-1 font-bold inline-block -rotate-1 shadow-sm">{highlight}</span>
+                              <span className="relative inline-block mx-1">
+                                {/* Yellow Highlighter Mark */}
+                                <span className="absolute inset-0 bg-yellow-300 mix-blend-multiply rounded-sm rotate-1 scale-105" />
+                                <span className="relative z-10 font-bold px-1 border-b-2 border-black/20">{highlight}</span>
+                              </span>
                             )}
                             {text.split(highlight)[1]}
                           </>
@@ -194,7 +232,7 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
             </div>
 
             {/* Smiley doodle */}
-            <div className="absolute bottom-6 right-8 opacity-40 mt-auto">
+            <div className="absolute bottom-6 right-8 opacity-40 mt-auto pointer-events-none z-10">
               <svg width="24" height="24" viewBox="0 0 100 100" fill="none" stroke="black" strokeWidth="4" strokeLinecap="round">
                 <circle cx="50" cy="50" r="40" />
                 <path d="M35 40 v10 M65 40 v10" />

@@ -73,7 +73,7 @@ HUMOR RULES - Every roast must satisfy ALL of these:
 5. Avoid corporate language. NEVER say: improve, optimize, leverage, consider, could benefit.
 6. Use relatable analogies (Netflix, Amazon, IKEA, Google, Apple, TikTok, Gmail, airport security, grocery list, college syllabus, wedding invitation, instruction manual, WhatsApp group, Excel sheet, etc.)
 7. Never force jokes. One amazing joke is better than five average ones.
-8. Maximum 18 words for roast lines.
+8. Maximum 10 words for roast lines (EXTREMELY punchy).
 9. Every roast should be quotable. Someone should want to tweet it.
 10. If no funny analogy naturally exists, stay clever instead of forcing humor.
 11. Humor > Sarcasm > Information.
@@ -89,18 +89,19 @@ Return JSON exactly in this format. (THIS IS A PAID ROAST, BE INCREDIBLY FUNNY):
 {
   "share_certificate": {
     "product_name": "Extract the app/website name (max 3 words)",
+    "brand_color": "Extract a LIGHT, pastel version of the dominant brand hex color suitable for dark text (e.g. Spotify = #dcf8e5). If unknown, return null.",
     "main_roast_headline": "One massive funny quote-worthy headline using VERY simple, dumbed-down English. ZERO sophisticated words. (e.g. 'You built a Swiss Army knife, then marketed it like a kitchen drawer exploded.')",
     "roast_pointers": [
       {
-        "text": "Max 18 words funny pointer 1 (e.g. Half your installs are probably your own devices.)",
+        "text": "Max 10 words funny pointer 1 (e.g. Half your installs are probably your own devices.)",
         "highlight": "your own devices"
       },
       {
-        "text": "Max 18 words funny pointer 2 ROASTING THEIR VISUALS/SCREENSHOTS (e.g. Your screenshots explain every feature except why anyone should care.)",
+        "text": "Max 10 words funny pointer 2 ROASTING THEIR VISUALS/SCREENSHOTS (e.g. Your screenshots explain every feature except why anyone should care.)",
         "highlight": "key phrase"
       },
       {
-        "text": "Max 18 words funny pointer 3 comparing them to a top competitor (e.g. Splitwise is actually simple; yours just feels... there.)",
+        "text": "Max 10 words funny pointer 3 comparing them to a top competitor (e.g. Splitwise is actually simple; yours just feels... there.)",
         "highlight": "Competitor Name (e.g. Splitwise)"
       }
     ],

@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
         email: user.email,
         uid: user.uid
       },
-      return_url: return_url || 'https://storeroast.live',
+      return_url: 'https://storeroast.live/',
     });
 
     return NextResponse.json({ checkout_url: session.checkout_url });
