@@ -3,8 +3,9 @@ import { Mail, ArrowRight, Loader2, Sparkles, CheckCircle2, ArrowLeft, ShieldChe
 import { motion } from 'framer-motion';
 import { auth } from '../../utils/firebase';
 import { sendSignInLinkToEmail, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import toast from 'react-hot-toast';
 
-export default function LoginCard({ onBack }: { onBack: () => void }) {
+export default function LoginCard({ onBack }: { onBack?: () => void }) {
   const [email, setEmail] = useState('');
   const [step, setStep] = useState<'EMAIL' | 'OTP'>('EMAIL');
   const [isLoading, setIsLoading] = useState(false);
