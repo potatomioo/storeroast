@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Header from "@/components/layout/Header";
 import Hero from "@/components/home/Hero";
 import Features from "@/components/home/Features";
+import Pricing from "@/components/home/Pricing";
 import FooterCTA from "@/components/layout/FooterCTA";
 import LoadingScreen from "@/components/flow/LoadingScreen";
 import ResultTeaser from "@/components/flow/ResultTeaser";
@@ -16,7 +17,7 @@ import { onAuthStateChanged, isSignInWithEmailLink, signInWithEmailLink, signOut
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 
-type AppState = 'IDLE' | 'LOADING' | 'RESULT';
+type AppState = 'IDLE' | 'LOADING' | 'RESULT' | 'PRICING' | 'LOGIN';
 
 export default function Home() {
   const router = useRouter();
@@ -28,7 +29,6 @@ export default function Home() {
   // Auth & Credits State
   const [session, setSession] = useState<User | null>(null);
   const [credits, setCredits] = useState<number>(0);
-  const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
     const handleMagicLink = async () => {
@@ -60,8 +60,19 @@ export default function Home() {
       } else {
         toast.error("Payment failed or was cancelled.");
       }
-      window.location.replace(window.location.pathname);
+      // Remove query params without reloading the page so toast is visible
+      window.history.replaceState({}, document.title, window.location.pathname);
+      updateState('IDLE');
     }
+
+    const handlePopState = (e: PopStateEvent) => {
+      if (e.state && e.state.appState) {
+        setAppState(e.state.appState);
+      } else {
+        setAppState('IDLE');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
 
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setSession(user);
@@ -76,7 +87,7 @@ export default function Home() {
             setCredits(0);
           }
         });
-        setShowLogin(false);
+        setAppState((prev) => prev === 'LOGIN' ? 'IDLE' : prev);
         // Save the snapshot unsubscribe function to window so we can clean it up later if needed
         (window as any)._unsubscribeSnapshot = unsubscribeSnapshot;
       } else {
@@ -92,8 +103,26 @@ export default function Home() {
       if ((window as any)._unsubscribeSnapshot) {
         (window as any)._unsubscribeSnapshot();
       }
+      window.removeEventListener('popstate', handlePopState);
     };
   }, []);
+
+  const updateState = (newState: AppState) => {
+    setAppState(newState);
+    
+    const currentDepth = window.history.state?.depth || 0;
+    const nextDepth = currentDepth + 1;
+
+    if (newState === 'RESULT') {
+      window.history.pushState({ appState: 'RESULT', depth: nextDepth }, '', '#result');
+    } else if (newState === 'PRICING') {
+      window.history.pushState({ appState: 'PRICING', depth: nextDepth }, '', '#pricing');
+    } else if (newState === 'LOGIN') {
+      window.history.pushState({ appState: 'LOGIN', depth: nextDepth }, '', '#login');
+    } else if (newState === 'IDLE') {
+      window.history.pushState({ appState: 'IDLE', depth: nextDepth }, '', window.location.pathname);
+    }
+  };
 
   // (fetchOrCreateProfile removed as it's now handled by onSnapshot)
 
@@ -102,6 +131,35 @@ export default function Home() {
     setSession(null);
     setCredits(0);
     window.location.reload();
+  };
+
+  const handlePayment = async () => {
+    if (!session || !session.email) {
+      updateState('LOGIN');
+      return;
+    }
+    
+    try {
+      const token = await session.getIdToken();
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          return_url: window.location.origin
+        })
+      });
+      const data = await res.json();
+      if (data.checkout_url) {
+        window.location.href = data.checkout_url;
+      } else {
+        toast.error(data.error || 'Failed to create checkout session');
+      }
+    } catch (err: any) {
+      toast.error('Error connecting to checkout: ' + err.message);
+    }
   };
 
   const handleRoastStart = async (url: string) => {
@@ -127,7 +185,7 @@ export default function Home() {
           router.push('/pricing');
         } else {
           // Not logged in and hit free limit
-          setShowLogin(true);
+          updateState('LOGIN');
         }
         return;
       }
@@ -139,21 +197,43 @@ export default function Home() {
         router.push(`/report/${data.reportId}`);
       } else {
         setFreeRoastData(data.data);
-        setAppState('RESULT');
+        updateState('RESULT');
       }
     } catch (err: any) {
       setError(err.message);
-      setAppState('IDLE');
+      updateState('IDLE');
       toast.error(err.message);
     }
   };
 
+  const handleHomeClick = () => {
+    const currentDepth = window.history.state?.depth || 0;
+    if (currentDepth > 0) {
+      window.history.go(-currentDepth);
+    } else {
+      updateState('IDLE');
+    }
+    setAppState('IDLE');
+    window.scrollTo(0,0);
+  };
+
+  const handlePricingClick = () => {
+    updateState('PRICING');
+    window.scrollTo(0,0);
+  };
+
   return (
     <main className="min-h-screen flex flex-col items-center bg-gray-50 text-black">
-      <Header session={session} credits={credits} onLogout={handleLogout} onGetStarted={() => setShowLogin(true)} />
+      <Header session={session} credits={credits} onLogout={handleLogout} onGetStarted={() => updateState('LOGIN')} onHome={handleHomeClick} onPricing={handlePricingClick} />
 
-      {showLogin ? (
-        <LoginCard onBack={() => setShowLogin(false)} />
+      {appState === 'LOGIN' ? (
+        <LoginCard onBack={() => {
+          if ((window.history.state?.depth || 0) > 0) {
+            window.history.back();
+          } else {
+            updateState('IDLE');
+          }
+        }} />
       ) : appState === 'IDLE' ? (
         <>
           <Hero onRoast={handleRoastStart} />
@@ -164,13 +244,26 @@ export default function Home() {
       ) : appState === 'RESULT' && freeRoastData ? (
         <ResultTeaser 
           roastData={freeRoastData} 
-          onPaid={() => router.push('/pricing')} 
-          onBack={() => setAppState('IDLE')} 
+          onPaid={() => {
+            window.scrollTo(0,0);
+            updateState('PRICING');
+          }} 
+          onBack={() => {
+            if ((window.history.state?.depth || 0) > 0) window.history.back();
+            else updateState('IDLE');
+          }} 
           isPaidUser={false} 
         />
+      ) : appState === 'PRICING' ? (
+        <div className="w-full pb-32">
+          <Pricing onBuy={handlePayment} isLoggedIn={!!session} onBack={() => {
+            if ((window.history.state?.depth || 0) > 0) window.history.back();
+            else updateState(freeRoastData ? 'RESULT' : 'IDLE');
+          }} />
+        </div>
       ) : null}
       
-      <FooterCTA />
+      <FooterCTA onHome={handleHomeClick} onPricing={handlePricingClick} />
     </main>
   );
 }

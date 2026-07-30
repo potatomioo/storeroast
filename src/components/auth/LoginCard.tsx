@@ -10,8 +10,12 @@ export default function LoginCard({ onBack }: { onBack: () => void }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSendLink = async (e: React.FormEvent) => {
+  const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email.trim()) {
+      toast.error('Please enter your email address first.');
+      return;
+    }
     setError('');
     setIsLoading(true);
 
@@ -62,11 +66,11 @@ export default function LoginCard({ onBack }: { onBack: () => void }) {
             <ShieldCheck className="w-6 h-6 text-white" />
           </div>
           <h2 className="text-4xl md:text-5xl font-black text-black mb-2 font-handwriting">
-            {step === 'EMAIL' ? 'Prepare Your Ego.' : 'Check your inbox'}
+            {step === 'EMAIL' ? 'Sign in.' : 'Check your inbox'}
           </h2>
           <p className="text-black/80 font-bold font-handwriting text-xl mt-2">
             {step === 'EMAIL'
-              ? 'Sign in to find out why your app\'s conversion rate is hot garbage.'
+              ? "Let's make your conversion less embarrassing"
               : `We sent a magic link to ${email}. Let's see if you can follow basic instructions.`}
           </p>
         </div>
@@ -95,15 +99,14 @@ export default function LoginCard({ onBack }: { onBack: () => void }) {
               <div className="flex-1 h-0.5 bg-black"></div>
             </div>
 
-            <form onSubmit={handleSendLink} className="flex flex-col gap-4">
+            <form onSubmit={handleEmailLogin} className="flex flex-col gap-4" noValidate>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                 <input
                   type="email"
-                  placeholder="developer@example.com"
+                  placeholder="hello@fmail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
                   className="w-full bg-white border-2 border-black rounded-xl px-12 py-3.5 font-bold text-black outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all placeholder-gray-400"
                 />
               </div>
@@ -112,7 +115,7 @@ export default function LoginCard({ onBack }: { onBack: () => void }) {
                 className="bg-black text-white px-8 py-3.5 rounded-xl font-bold hover:bg-gray-800 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-1 w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
-                Send Magic Link (If You Dare)
+                Send Me
               </button>
             </form>
           </div>

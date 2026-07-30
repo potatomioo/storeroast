@@ -25,8 +25,8 @@ export default function Hero({ onRoast }: { onRoast: (url: string) => void }) {
           transition={{ delay: 0.1 }}
           className="relative"
         >
-          <h1 className="text-6xl md:text-8xl font-handwriting font-bold tracking-tighter text-black leading-[0.9] mb-6">
-            Your app listing is <span className="bg-black text-white px-4 py-1 inline-block -rotate-2 shadow-xl">trash.</span>
+          <h1 className="text-6xl md:text-8xl font-handwriting font-bold tracking-tighter text-black leading-tight mb-6">
+            Your first impression is <span className="bg-black text-white px-4 py-1 inline-block -rotate-2 shadow-xl align-middle mt-0">trash.</span>
           </h1>
           <div className="absolute -right-8 -top-8 rotate-12 hidden md:block opacity-60">
             <svg width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="red" strokeWidth="4" strokeLinecap="round">
@@ -41,7 +41,7 @@ export default function Hero({ onRoast }: { onRoast: (url: string) => void }) {
           transition={{ delay: 0.2 }}
           className="mt-4 text-2xl md:text-3xl font-handwriting text-red-600 max-w-2xl leading-tight"
         >
-          "Let's find out why your conversion rate is flatlining."
+          Brutally honest AI feedback for your App Store listing, Play Store listing, or website.
         </motion.p>
 
         <motion.div
@@ -75,7 +75,7 @@ export default function Hero({ onRoast }: { onRoast: (url: string) => void }) {
               Roast It
             </button>
           </div>
-          <p className="mt-6 text-lg font-handwriting text-black/70">No sign-up required for your first free roast.</p>
+          <p className="mt-6 text-lg font-handwriting text-black/70">No sign-up required for basic, free, eww roasts.</p>
 
           <div className="absolute -left-16 top-1/2 -rotate-12 hidden md:block">
             <svg width="80" height="80" viewBox="0 0 100 100" fill="none" stroke="black" strokeWidth="4" strokeLinecap="round">

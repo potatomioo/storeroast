@@ -40,6 +40,11 @@ try {
 
 export async function POST(req: NextRequest) {
   try {
+    // 🚩 UI TESTING FLAG 🚩
+    // Set this to TRUE to completely bypass Redis rate limits AND Gemini API quotas.
+    // It will return a fake funny roast instantly so you can build the frontend UI freely.
+    const MOCK_FOR_UI_TESTING = false;
+
     const forwardedFor = req.headers.get('x-forwarded-for');
     const realIp = req.headers.get('x-real-ip');
     const ip = (forwardedFor ? forwardedFor.split(',')[0].trim() : (realIp || '127.0.0.1'));
@@ -72,7 +77,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Apply Rate Limits
-    if (minuteLimit && dailyLimit) {
+    if (minuteLimit && dailyLimit && !MOCK_FOR_UI_TESTING) {
       const identifier = user ? user.uid : ip;
       
       // 1. Minute Limit (applies to EVERYONE to protect Gemini quota)
@@ -115,43 +120,68 @@ export async function POST(req: NextRequest) {
 
     const isWebsite = appData.type === 'website';
     
-    const promptText = isPaidRoast 
-      ? buildDeepRoastPrompt(appData, isWebsite)
-      : buildQuickRoastPrompt(appData, isWebsite);
+    let roastJson;
 
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash", 
-      generationConfig: { 
-        responseMimeType: "application/json",
-        temperature: 0.85,
-        topP: 0.95
-      } 
-    });
-    
-    const parts: any[] = [{ text: promptText }];
-    
-    // ONLY send screenshots if it's a paid deep roast to save massive token costs
-    if (isPaidRoast && 'screenshots' in appData && Array.isArray(appData.screenshots)) {
-      for (const imgUrl of appData.screenshots) {
-        try {
-          const imgRes = await fetch(imgUrl);
-          const arrayBuffer = await imgRes.arrayBuffer();
-          const base64 = Buffer.from(arrayBuffer).toString('base64');
-          parts.push({
-            inlineData: {
-              data: base64,
-              mimeType: 'image/jpeg'
-            }
-          });
-        } catch (e) {
-          console.error("Failed to load screenshot for AI", imgUrl);
+    if (MOCK_FOR_UI_TESTING) {
+      // Fake delay to simulate API loading
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      roastJson = {
+        share_certificate: {
+          product_name: "CollegeHooks",
+          main_roast_headline: "Looks like a template from 2012 that somehow survived the apocalypse.",
+          roast_pointers: [
+            { text: "Your call to action is hiding like it owes me money.", is_competitor_jab: false, is_visual_critique: false },
+            { text: "This brand color scheme looks like a bruised banana.", is_visual_critique: true, is_competitor_jab: false },
+            { text: "Even Internet Explorer would render this faster than your main competitor.", is_competitor_jab: true, is_visual_critique: false }
+          ],
+          brand_color: "var(--primary-yellow)"
+        },
+        report: {
+          pointers: [
+            { title: "Spacing Issues", description: "The spacing here is so tight it's claustrophobic. Give your elements some breathing room!" },
+            { title: "Boring Copy", description: "I've seen more personality in a blank Word document." }
+          ]
+        }
+      };
+    } else {
+      const promptText = isPaidRoast 
+        ? buildDeepRoastPrompt(appData, isWebsite)
+        : buildQuickRoastPrompt(appData, isWebsite);
+
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-2.5-flash", 
+        generationConfig: { 
+          responseMimeType: "application/json",
+          temperature: 0.85,
+          topP: 0.95
+        } 
+      });
+      
+      const parts: any[] = [{ text: promptText }];
+      
+      // ONLY send screenshots if it's a paid deep roast to save massive token costs
+      if (isPaidRoast && 'screenshots' in appData && Array.isArray(appData.screenshots)) {
+        for (const imgUrl of appData.screenshots) {
+          try {
+            const imgRes = await fetch(imgUrl);
+            const arrayBuffer = await imgRes.arrayBuffer();
+            const base64 = Buffer.from(arrayBuffer).toString('base64');
+            parts.push({
+              inlineData: {
+                data: base64,
+                mimeType: 'image/jpeg'
+              }
+            });
+          } catch (e) {
+            console.error("Failed to load screenshot for AI", imgUrl);
+          }
         }
       }
-    }
 
-    const result = await model.generateContent(parts);
-    const roastText = result.response.text();
-    const roastJson = JSON.parse(roastText);
+      const result = await model.generateContent(parts);
+      const roastText = result.response.text();
+      roastJson = JSON.parse(roastText);
+    }
 
     // Charge the user if they had credits
     if (isPaidRoast && adminDb && user) {

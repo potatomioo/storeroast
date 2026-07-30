@@ -15,7 +15,7 @@ export default function Features() {
         <div className="flex flex-col gap-6 order-2 lg:order-1">
           <h2 className="text-3xl md:text-5xl font-black tracking-tight text-gray-900">Wall of Flame</h2>
           <p className="text-gray-500 text-lg md:text-xl leading-relaxed">
-            Every week, we incinerate hundreds of mediocre listings. Join the ranks of developers who survived the roast and doubled their installs.
+            The lucky founders who survived the roast. Some fixed their products. Some fixed their egos. Some did both.
           </p>
 
           <div className="mt-8 flex gap-4">
@@ -30,31 +30,26 @@ export default function Features() {
           </div>
         </div>
 
-        <div className="relative order-1 lg:order-2 h-full min-h-[400px] flex items-center justify-center">
+        <div className="relative order-1 lg:order-2 h-full min-h-[260px] md:min-h-[280px] flex items-center justify-center py-8">
           {/* Testimonial 1 */}
-          <div className="absolute top-0 right-0 bg-white p-6 rounded-2xl shadow-xl w-[90%] border border-gray-100 z-10 rotate-2 hover:rotate-0 transition-transform">
-            <p className="text-gray-600 font-medium italic mb-6">
-              "They told me my main screenshot looked like it was from 2008. Brutal, but they were right. Fixed it, conversions up 40%."
+          <div className="absolute top-4 md:top-8 right-0 bg-white p-4 md:p-5 rounded-2xl shadow-xl w-[90%] border border-gray-100 z-10 rotate-2 hover:rotate-0 transition-transform">
+            <p className="text-gray-600 font-medium italic">
+              "I laughed for five minutes after reading. Then I redesigned screenshots."
             </p>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-xs font-bold">DM</div>
-              <span className="text-sm font-bold text-gray-900">@dev_marco</span>
-            </div>
           </div>
 
           {/* Survivor Badge */}
-          <div className="absolute top-1/2 left-4 -translate-y-1/2 bg-black text-white p-6 rounded-2xl shadow-2xl z-20 -rotate-3 hover:rotate-0 transition-transform">
+          <div className="absolute top-1/2 left-4 -translate-y-1/2 bg-black text-white p-4 md:p-5 rounded-2xl shadow-2xl z-20 -rotate-3 hover:rotate-0 transition-transform">
             <div className="text-2xl font-black italic tracking-tight mb-1">SURVIVOR</div>
             <div className="text-xs text-gray-400 font-medium">App Store Rank #4 (FinTech)</div>
           </div>
 
           {/* Testimonial 2 */}
-          <div className="absolute bottom-0 left-8 bg-white p-6 rounded-2xl shadow-xl w-[85%] border border-gray-100 z-10 -rotate-2 hover:rotate-0 transition-transform">
+          <div className="absolute bottom-4 md:bottom-8 left-8 bg-white p-4 md:p-5 rounded-2xl shadow-xl w-[85%] border border-gray-100 z-10 -rotate-2 hover:rotate-0 transition-transform">
             <div className="flex text-yellow-400 mb-3 text-sm">
               ★★★★★
             </div>
-            <p className="text-gray-900 font-bold mb-1">"The only ASO tool I trust."</p>
-            <p className="text-gray-500 text-sm font-medium">No fluff, just pure data-driven destruction.</p>
+            <p className="text-gray-900 font-bold">"The only roasting tool, i laughed over."</p>
           </div>
         </div>
       </motion.section>

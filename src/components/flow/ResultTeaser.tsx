@@ -1,11 +1,18 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Lock, Share2, ArrowLeft, ShieldCheck, Zap, Award, XCircle, ArrowDown } from 'lucide-react';
 import * as htmlToImage from 'html-to-image';
 
+const ANNOTATION_PHRASES = ['Oof.', '💀', 'Bruh.', 'Yikes.', '💀 Certified.', 'Too far?'];
+
 export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: { roastData: any, onPaid: () => void, onBack: () => void, isPaidUser: boolean }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isSharing, setIsSharing] = useState(false);
+  const [annotation, setAnnotation] = useState('Oof.');
+
+  useEffect(() => {
+    setAnnotation(ANNOTATION_PHRASES[Math.floor(Math.random() * ANNOTATION_PHRASES.length)]);
+  }, []);
 
   const cert = roastData.share_certificate;
   const rep = roastData.report;
@@ -74,7 +81,7 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
 
         <div className="flex items-center gap-3">
           {!isPaidUser && (
-            <button onClick={onPaid} className="hidden md:flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-950 px-5 py-2.5 rounded-full text-sm font-bold hover:brightness-110 transition-all shadow-md">
+            <button onClick={onPaid} className="hidden md:flex items-center gap-2 bg-[var(--primary-yellow)] border-2 border-black text-black px-5 py-2.5 rounded-xl text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-y-1 transition-all">
               <Award className="w-4 h-4" /> Get Verified Visual Ticket
             </button>
           )}
@@ -166,18 +173,18 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
               <h1 className={`font-handwriting font-bold tracking-tighter text-black leading-[0.9] relative z-10 ${isPaidUser ? 'text-5xl md:text-6xl' : 'text-6xl md:text-8xl'}`}>
                 {cert.product_name}
               </h1>
-              {/* Handwritten Underline */}
-              <svg className="absolute -bottom-2 left-0 w-full h-4 text-black opacity-80 z-0" viewBox="0 0 100 20" preserveAspectRatio="none">
-                <path d="M 5,10 Q 30,5 50,15 T 95,10" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+              {/* Hand-drawn Marker Underline (Thinner, Wobbly, Tapered) */}
+              <svg className="absolute -bottom-3 left-0 w-full h-4 text-black/70 z-0" viewBox="0 0 100 20" preserveAspectRatio="none">
+                <path d="M 2,13 Q 22,8 45,14 T 98,11" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
 
             {/* Main Savage Headline with Hand-drawn Arrow */}
             <div className={`w-full relative z-20 ${isPaidUser ? 'mb-6' : 'mb-8'}`}>
               {/* Handwritten "Ouch" Annotation */}
-              <div className="absolute -top-8 -right-4 md:-right-8 text-red-600 font-handwriting font-bold text-xl rotate-12 flex flex-col items-center">
-                <span>Oof.</span>
-                <svg className="w-6 h-6 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <div className="absolute -top-12 md:-top-16 -right-2 md:-right-6 text-red-600 font-handwriting font-bold text-xl rotate-12 flex flex-col items-center">
+                <span>{annotation}</span>
+                <svg className="w-6 h-6 text-red-600 -mt-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                   <path d="M12 4v16m0 0l-4-4m4 4l4-4" />
                 </svg>
               </div>
@@ -199,8 +206,8 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
 
                   return (
                     <div key={i} className="flex items-start gap-3 relative">
-                      <span className={`font-handwriting ${isPaidUser ? 'text-base md:text-lg' : 'text-lg md:text-xl'} text-black font-black shrink-0 mt-0.5`}>x</span>
-                      <span className={`font-handwriting ${isPaidUser ? 'text-base md:text-lg' : 'text-lg md:text-xl'} text-gray-900 leading-snug`}>
+                      <span className={`font-sans ${isPaidUser ? 'text-sm md:text-base' : 'text-base md:text-lg'} text-black/40 font-bold shrink-0 mt-1`}>✖</span>
+                      <span className={`font-sans ${isPaidUser ? 'text-sm md:text-base' : 'text-base md:text-lg'} font-medium text-gray-800 leading-relaxed tracking-tight`}>
                         {highlight && text.includes(highlight) ? (
                           <>
                             {text.split(highlight)[0]}
@@ -281,12 +288,12 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
               <div className="flex-1">
                 <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
                   <Lock className="w-6 h-6 text-black" />
-                  <h4 className="text-3xl font-black text-black uppercase tracking-tight font-handwriting">Unlock Deep Roast</h4>
+                  <h4 className="text-3xl font-black text-black uppercase tracking-tight font-handwriting">Unlock Visual Roast:</h4>
                 </div>
-                <p className="text-black/70 font-bold mb-8 text-lg font-handwriting">You've only seen the tip of the iceberg. Unlock the verified ticket and full pointer breakdown.</p>
+                <p className="text-black/70 font-bold mb-8 text-lg font-handwriting">You've only seen the basics, Visuals are still remaining. Unlock the Visual Roast Ticket and full pointer breakdown.</p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 md:mb-0">
-                  {['Verified Social Badge', 'Competitor Benchmark Pointer', 'UI/UX Visual Roast', 'More Fixes'].map((feature, i) => (
+                  {['Visual Roast', 'Competitor Benchmark', 'Brutal Report', 'Detailed Breakdown'].map((feature, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <div className="w-5 h-5 rounded-full bg-black text-[var(--primary-yellow)] flex items-center justify-center shrink-0">
                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>
