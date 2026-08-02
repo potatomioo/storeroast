@@ -60,12 +60,18 @@ export default function Home() {
       } else {
         toast.error("Payment failed or was cancelled.");
       }
-      // Remove query params without reloading the page so toast is visible
-      window.history.replaceState({}, document.title, window.location.pathname);
-      updateState('IDLE');
+      
+      // Implement a history trap to prevent going back to checkout
+      window.history.replaceState({ appState: 'IDLE', depth: 0, trap: true }, document.title, window.location.pathname);
+      window.history.pushState({ appState: 'IDLE', depth: 0 }, document.title, window.location.pathname);
+      setAppState('IDLE');
     }
 
     const handlePopState = (e: PopStateEvent) => {
+      if (e.state?.trap) {
+        window.history.forward();
+        return;
+      }
       if (e.state && e.state.appState) {
         setAppState(e.state.appState);
       } else {
@@ -120,7 +126,7 @@ export default function Home() {
     } else if (newState === 'LOGIN') {
       window.history.pushState({ appState: 'LOGIN', depth: nextDepth }, '', '#login');
     } else if (newState === 'IDLE') {
-      window.history.pushState({ appState: 'IDLE', depth: nextDepth }, '', window.location.pathname);
+      window.history.replaceState({ appState: 'IDLE', depth: 0 }, '', window.location.pathname);
     }
   };
 
@@ -153,7 +159,7 @@ export default function Home() {
       });
       const data = await res.json();
       if (data.checkout_url) {
-        window.location.href = data.checkout_url;
+        window.location.replace(data.checkout_url);
       } else {
         toast.error(data.error || 'Failed to create checkout session');
       }
@@ -223,45 +229,55 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center bg-gray-50 text-black">
-      <Header session={session} credits={credits} onLogout={handleLogout} onGetStarted={() => updateState('LOGIN')} onHome={handleHomeClick} onPricing={handlePricingClick} />
+    <main className="min-h-screen flex flex-col items-center bg-gray-50 text-black relative">
+      <div className="absolute top-0 w-full flex justify-center z-50">
+        <Header session={session} credits={credits} onLogout={handleLogout} onGetStarted={() => updateState('LOGIN')} onHome={handleHomeClick} onPricing={handlePricingClick} />
+      </div>
 
-      {appState === 'LOGIN' ? (
-        <LoginCard onBack={() => {
-          if ((window.history.state?.depth || 0) > 0) {
-            window.history.back();
-          } else {
-            updateState('IDLE');
-          }
-        }} />
-      ) : appState === 'IDLE' ? (
-        <>
-          <Hero onRoast={handleRoastStart} />
-          <Features />
-        </>
-      ) : appState === 'LOADING' ? (
-        <LoadingScreen />
-      ) : appState === 'RESULT' && freeRoastData ? (
-        <ResultTeaser 
-          roastData={freeRoastData} 
-          onPaid={() => {
-            window.scrollTo(0,0);
-            updateState('PRICING');
-          }} 
-          onBack={() => {
-            if ((window.history.state?.depth || 0) > 0) window.history.back();
-            else updateState('IDLE');
-          }} 
-          isPaidUser={false} 
-        />
-      ) : appState === 'PRICING' ? (
-        <div className="w-full pb-32">
-          <Pricing onBuy={handlePayment} isLoggedIn={!!session} onBack={() => {
-            if ((window.history.state?.depth || 0) > 0) window.history.back();
-            else updateState(freeRoastData ? 'RESULT' : 'IDLE');
-          }} />
-        </div>
-      ) : null}
+      <div className="w-full flex-1 flex flex-col items-center">
+        {appState === 'LOGIN' ? (
+          <div className="w-full pt-32 flex justify-center">
+            <LoginCard onBack={() => {
+              if ((window.history.state?.depth || 0) > 0) {
+                window.history.back();
+              } else {
+                updateState('IDLE');
+              }
+            }} />
+          </div>
+        ) : appState === 'IDLE' ? (
+          <div className="w-full">
+            <Hero onRoast={handleRoastStart} />
+            <Features />
+          </div>
+        ) : appState === 'LOADING' ? (
+          <div className="w-full pt-32">
+            <LoadingScreen />
+          </div>
+        ) : appState === 'RESULT' && freeRoastData ? (
+          <div className="w-full pt-32 flex justify-center">
+            <ResultTeaser 
+              roastData={freeRoastData} 
+              onPaid={() => {
+                window.scrollTo(0,0);
+                updateState('PRICING');
+              }} 
+              onBack={() => {
+                if ((window.history.state?.depth || 0) > 0) window.history.back();
+                else updateState('IDLE');
+              }} 
+              isPaidUser={false} 
+            />
+          </div>
+        ) : appState === 'PRICING' ? (
+          <div className="w-full pt-32 pb-32 flex justify-center">
+            <Pricing onBuy={handlePayment} isLoggedIn={!!session} onBack={() => {
+              if ((window.history.state?.depth || 0) > 0) window.history.back();
+              else updateState(freeRoastData ? 'RESULT' : 'IDLE');
+            }} />
+          </div>
+        ) : null}
+      </div>
       
       <FooterCTA onHome={handleHomeClick} onPricing={handlePricingClick} />
     </main>

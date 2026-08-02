@@ -8,7 +8,7 @@ export default function Hero({ onRoast }: { onRoast: (url: string) => void }) {
 
   return (
     <section
-      className="w-full pt-12 pb-32 relative flex justify-center -mt-24"
+      className="w-full pt-32 pb-24 relative flex justify-center"
       style={{
         backgroundImage: "radial-gradient(circle at 15px 100%, transparent 10px, var(--primary-yellow) 10.5px)",
         backgroundSize: "30px 100%",
@@ -17,7 +17,7 @@ export default function Hero({ onRoast }: { onRoast: (url: string) => void }) {
       }}
     >
 
-      <div className="flex flex-col items-center text-center mt-20 max-w-4xl z-10 w-full px-4">
+      <div className="flex flex-col items-center text-center mt-12 max-w-4xl z-10 w-full px-4">
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
