@@ -41,9 +41,7 @@ export default function Home() {
           try {
             await signInWithEmailLink(auth, email, window.location.href);
             window.localStorage.removeItem('emailForSignIn');
-            // Remove the magic link query params so they don't break subsequent reloads
-            window.history.replaceState({}, document.title, window.location.pathname);
-            toast.success("Successfully signed in!");
+            window.location.replace('/');
           } catch (error) {
             console.error("Error signing in with magic link", error);
           }
@@ -114,6 +112,8 @@ export default function Home() {
   }, []);
 
   const updateState = (newState: AppState) => {
+    if (appState === newState || window.history.state?.appState === newState) return;
+    
     setAppState(newState);
     
     const currentDepth = window.history.state?.depth || 0;

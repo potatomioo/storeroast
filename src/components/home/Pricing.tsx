@@ -1,7 +1,9 @@
-import React from 'react';
-import { Check, X, ArrowLeft } from 'lucide-react';
+import React, { useState } from 'react';
+import { Check, X, ArrowLeft, Loader2 } from 'lucide-react';
 
-export default function Pricing({ onBuy, isLoggedIn, onBack }: { onBuy?: () => void, isLoggedIn?: boolean, onBack?: () => void }) {
+export default function Pricing({ onBuy, isLoggedIn, onBack }: { onBuy?: () => Promise<void> | void, isLoggedIn?: boolean, onBack?: () => void }) {
+  const [isLoading, setIsLoading] = useState(false);
+
   return (
     <section id="pricing" className="mt-20 mx-auto w-full max-w-5xl flex flex-col items-center px-4 relative">
       {onBack && (
@@ -59,10 +61,18 @@ export default function Pricing({ onBuy, isLoggedIn, onBack }: { onBuy?: () => v
 
           {onBuy && (
             <button
-              onClick={onBuy}
-              className="w-full bg-black text-white rounded-lg py-4 font-black text-sm uppercase tracking-wider hover:bg-gray-800 transition-transform shadow-lg"
+              onClick={async () => {
+                setIsLoading(true);
+                try {
+                  await onBuy();
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
+              disabled={isLoading}
+              className="w-full bg-black text-white rounded-lg py-4 font-black text-sm uppercase tracking-wider hover:bg-gray-800 transition-transform shadow-lg flex justify-center items-center disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              {isLoggedIn ? 'Buy 10 Credits ($1.99)' : 'Sign In to Buy'}
+              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : (isLoggedIn ? 'Buy 10 Credits ($1.99)' : 'Sign In to Buy')}
             </button>
           )}
         </div>

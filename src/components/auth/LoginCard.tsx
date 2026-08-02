@@ -43,7 +43,7 @@ export default function LoginCard({ onBack }: { onBack?: () => void }) {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-      window.location.reload();
+      window.location.replace('/');
     } catch (err: any) {
       setError(err.message || String(err));
       setIsLoading(false);
