@@ -68,7 +68,8 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
   const displayPointers = isPaidUser ? cert.roast_pointers : cert.roast_pointers.slice(0, 2);
   const displayReportPointers = isPaidUser ? rep.pointers : (rep.pointers || []).slice(0, 2);
 
-  const themeColor = cert?.brand_color || 'var(--primary-yellow)';
+  const isValidHex = (hex: string) => /^#([0-9A-F]{3}){1,2}$/i.test(hex);
+  const themeColor = (cert?.brand_color && isValidHex(cert?.brand_color)) ? cert.brand_color : 'var(--primary-yellow)';
 
   return (
     <div className="w-full max-w-4xl flex flex-col items-center mt-2 mb-8 z-10 px-4 md:px-0">

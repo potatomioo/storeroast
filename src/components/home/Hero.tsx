@@ -23,10 +23,10 @@ export default function Hero({ onRoast }: { onRoast: (url: string) => void }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="relative"
+          className="relative w-full"
         >
-          <h1 className="text-6xl md:text-8xl font-handwriting font-bold tracking-tighter text-black leading-tight mb-6">
-            Your first impression is <span className="bg-black text-white px-4 py-1 inline-block -rotate-2 shadow-xl align-middle mt-0">trash.</span>
+          <h1 className="text-5xl md:text-8xl font-handwriting font-bold tracking-tighter text-black leading-tight mb-6">
+            Your first impression is <span className="bg-black text-white px-3 py-1 md:px-4 md:py-1 inline-block -rotate-2 shadow-xl align-middle mt-0">trash.</span>
           </h1>
           <div className="absolute -right-8 -top-8 rotate-12 hidden md:block opacity-60">
             <svg width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="red" strokeWidth="4" strokeLinecap="round">

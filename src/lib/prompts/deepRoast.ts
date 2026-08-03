@@ -89,7 +89,7 @@ Return JSON exactly in this format. (THIS IS A PAID ROAST, BE INCREDIBLY FUNNY):
 {
   "share_certificate": {
     "product_name": "Extract the app/website name (max 3 words)",
-    "brand_color": "Extract a LIGHT, pastel version of the dominant brand hex color suitable for dark text (e.g. Spotify = #dcf8e5). If unknown, return null.",
+    "brand_color": "Extract a LIGHT, pastel version of the brand's secondary color that looks good as a background for dark text. For dark-mode websites, do NOT use black/dark grey. Pick a vibrant secondary color (like blue, purple, green) and make it light/pastel (e.g. #dcf8e5). Must be a valid hex code. Return #Facc15 if unsure.",
     "main_roast_headline": "One massive funny quote-worthy headline using VERY simple, dumbed-down English. ZERO sophisticated words. (e.g. 'You built a Swiss Army knife, then marketed it like a kitchen drawer exploded.')",
     "roast_pointers": [
       {

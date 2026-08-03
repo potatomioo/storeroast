@@ -50,19 +50,29 @@ export default function Home() {
     };
     handleMagicLink();
 
+    // Check for pending payment toasts from hard reloads
+    const pendingToast = sessionStorage.getItem('payment_toast');
+    if (pendingToast) {
+      if (pendingToast === 'success') {
+        toast.success("Payment successful! Credits added.");
+      } else if (pendingToast === 'failed') {
+        toast.error("Payment failed or was cancelled.");
+      }
+      sessionStorage.removeItem('payment_toast');
+    }
+
     // Clean up generic Dodo redirect parameters if present
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('payment_id')) {
       if (urlParams.get('status') === 'succeeded') {
-        toast.success("Payment successful! Credits added.");
+        sessionStorage.setItem('payment_toast', 'success');
       } else {
-        toast.error("Payment failed or was cancelled.");
+        sessionStorage.setItem('payment_toast', 'failed');
       }
       
-      // Implement a history trap to prevent going back to checkout
-      window.history.replaceState({ appState: 'IDLE', depth: 0, trap: true }, document.title, window.location.pathname);
-      window.history.pushState({ appState: 'IDLE', depth: 0 }, document.title, window.location.pathname);
-      setAppState('IDLE');
+      // Perform a hard redirect to completely scrub the history stack
+      window.location.replace('/');
+      return;
     }
 
     const handlePopState = (e: PopStateEvent) => {
