@@ -44,33 +44,36 @@ export async function POST(req: NextRequest) {
       if (uid) {
         // Direct document update by uid
         const docRef = adminDb.collection('profiles').doc(uid);
-        const docSnap = await docRef.get();
         const paymentId = payloadData?.payment_id || (event as any).payment_id || payloadData?.checkout_session_id || 'unknown_payment';
         
-        if (docSnap.exists) {
-          const profileData = docSnap.data();
-          const currentCredits = profileData?.credits || 0;
-          const processedPayments = profileData?.processed_payments || [];
+        await adminDb.runTransaction(async (t) => {
+          const docSnap = await t.get(docRef);
           
-          if (processedPayments.includes(paymentId)) {
-            console.log(`Payment ${paymentId} already processed for uid: ${uid}. Skipping.`);
-            return NextResponse.json({ received: true, skipped: true });
-          }
+          if (docSnap.exists) {
+            const profileData = docSnap.data();
+            const currentCredits = profileData?.credits || 0;
+            const processedPayments = profileData?.processed_payments || [];
+            
+            if (processedPayments.includes(paymentId)) {
+              console.log(`Payment ${paymentId} already processed for uid: ${uid}. Skipping.`);
+              return;
+            }
 
-          await docRef.update({ 
-            credits: currentCredits + 10,
-            processed_payments: [...processedPayments, paymentId]
-          });
-          console.log(`Successfully added 10 credits to uid: ${uid}`);
-        } else {
-          // If profile doc doesn't exist for some reason, create it
-          await docRef.set({ 
-            email: email || 'unknown', 
-            credits: 10,
-            processed_payments: [paymentId]
-          });
-          console.log(`Created profile and added 10 credits to uid: ${uid}`);
-        }
+            t.update(docRef, { 
+              credits: currentCredits + 10,
+              processed_payments: [...processedPayments, paymentId]
+            });
+            console.log(`Successfully added 10 credits to uid: ${uid}`);
+          } else {
+            // If profile doc doesn't exist for some reason, create it
+            t.set(docRef, { 
+              email: email || 'unknown', 
+              credits: 10,
+              processed_payments: [paymentId]
+            });
+            console.log(`Created profile and added 10 credits to uid: ${uid}`);
+          }
+        });
       } else if (email) {
         // Fallback: Query by email if uid is somehow missing
         const profilesRef = adminDb.collection('profiles');
@@ -78,21 +81,27 @@ export async function POST(req: NextRequest) {
         const paymentId = payloadData?.payment_id || (event as any).payment_id || payloadData?.checkout_session_id || 'unknown_payment';
         
         if (!snapshot.empty) {
-          const doc = snapshot.docs[0];
-          const profileData = doc.data();
-          const currentCredits = profileData.credits || 0;
-          const processedPayments = profileData.processed_payments || [];
+          const docRef = snapshot.docs[0].ref;
+          
+          await adminDb.runTransaction(async (t) => {
+            const docSnap = await t.get(docRef);
+            if (!docSnap.exists) return; // Should not happen, but safe
+            
+            const profileData = docSnap.data() as any;
+            const currentCredits = profileData.credits || 0;
+            const processedPayments = profileData.processed_payments || [];
 
-          if (processedPayments.includes(paymentId)) {
-            console.log(`Payment ${paymentId} already processed for email: ${email}. Skipping.`);
-            return NextResponse.json({ received: true, skipped: true });
-          }
+            if (processedPayments.includes(paymentId)) {
+              console.log(`Payment ${paymentId} already processed for email: ${email}. Skipping.`);
+              return;
+            }
 
-          await doc.ref.update({ 
-            credits: currentCredits + 10,
-            processed_payments: [...processedPayments, paymentId]
+            t.update(docRef, { 
+              credits: currentCredits + 10,
+              processed_payments: [...processedPayments, paymentId]
+            });
+            console.log(`Fallback: Successfully added 10 credits to email: ${email}`);
           });
-          console.log(`Fallback: Successfully added 10 credits to email: ${email}`);
         } else {
           console.error(`Profile not found for email: ${email} and no uid provided.`);
         }

@@ -40,10 +40,10 @@ try {
 
 export async function POST(req: NextRequest) {
   try {
-    // 🚩 UI TESTING FLAG 🚩
-    // Set this to TRUE to completely bypass Redis rate limits AND Gemini API quotas.
-    // It will return a fake funny roast instantly so you can build the frontend UI freely.
-    const MOCK_FOR_UI_TESTING = false;
+    // Fail closed if Upstash is configured but failed to initialize
+    if (process.env.UPSTASH_REDIS_REST_URL && (!minuteLimit || !dailyLimit)) {
+      return NextResponse.json({ error: 'Rate limiting service unavailable.' }, { status: 500 });
+    }
 
     const forwardedFor = req.headers.get('x-forwarded-for');
     const realIp = req.headers.get('x-real-ip');
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Apply Rate Limits
-    if (minuteLimit && dailyLimit && !MOCK_FOR_UI_TESTING) {
+    if (minuteLimit && dailyLimit) {
       const identifier = user ? user.uid : ip;
       
       // 1. Minute Limit (applies to EVERYONE to protect Gemini quota)
@@ -103,48 +103,30 @@ export async function POST(req: NextRequest) {
     }
 
     let appData;
-    
-    if (url.includes('play.google.com')) {
-      const appIdMatch = url.match(/id=([a-zA-Z0-9._]+)/);
-      if (!appIdMatch) return NextResponse.json({ error: 'Invalid Play Store URL' }, { status: 400 });
-      appData = await scrapePlayStore(appIdMatch[1]);
-    } 
-    else if (url.includes('apps.apple.com')) {
-      const appIdMatch = url.match(/id(\d+)/);
-      if (!appIdMatch) return NextResponse.json({ error: 'Invalid App Store URL' }, { status: 400 });
-      appData = await scrapeAppStore(appIdMatch[1]);
-    } 
-    else {
-      appData = await scrapeWebsite(url);
+    try {
+      if (url.includes('play.google.com')) {
+        const appIdMatch = url.match(/id=([a-zA-Z0-9._]+)/);
+        if (!appIdMatch) return NextResponse.json({ error: 'Invalid Play Store URL' }, { status: 400 });
+        appData = await scrapePlayStore(appIdMatch[1]);
+      } 
+      else if (url.includes('apps.apple.com')) {
+        const appIdMatch = url.match(/id(\d+)/);
+        if (!appIdMatch) return NextResponse.json({ error: 'Invalid App Store URL' }, { status: 400 });
+        appData = await scrapeAppStore(appIdMatch[1]);
+      } 
+      else {
+        appData = await scrapeWebsite(url);
+      }
+    } catch (scrapeErr: any) {
+      console.error("Scraper failed:", scrapeErr);
+      return NextResponse.json({ error: 'Failed to access the provided URL. The site might be down or actively blocking bots (e.g. Cloudflare).' }, { status: 400 });
     }
 
     const isWebsite = appData.type === 'website';
     
     let roastJson;
 
-    if (MOCK_FOR_UI_TESTING) {
-      // Fake delay to simulate API loading
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      roastJson = {
-        share_certificate: {
-          product_name: "CollegeHooks",
-          main_roast_headline: "Looks like a template from 2012 that somehow survived the apocalypse.",
-          roast_pointers: [
-            { text: "Your call to action is hiding like it owes me money.", is_competitor_jab: false, is_visual_critique: false },
-            { text: "This brand color scheme looks like a bruised banana.", is_visual_critique: true, is_competitor_jab: false },
-            { text: "Even Internet Explorer would render this faster than your main competitor.", is_competitor_jab: true, is_visual_critique: false }
-          ],
-          brand_color: "var(--primary-yellow)"
-        },
-        report: {
-          pointers: [
-            { title: "Spacing Issues", description: "The spacing here is so tight it's claustrophobic. Give your elements some breathing room!" },
-            { title: "Boring Copy", description: "I've seen more personality in a blank Word document." }
-          ]
-        }
-      };
-    } else {
-      const promptText = isPaidRoast 
+    const promptText = isPaidRoast 
         ? buildDeepRoastPrompt(appData, isWebsite)
         : buildQuickRoastPrompt(appData, isWebsite);
 
@@ -181,7 +163,6 @@ export async function POST(req: NextRequest) {
       const result = await model.generateContent(parts);
       const roastText = result.response.text();
       roastJson = JSON.parse(roastText);
-    }
 
     // Charge the user if they had credits
     if (isPaidRoast && adminDb && user) {

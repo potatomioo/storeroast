@@ -64,18 +64,29 @@ export default function Home() {
     // Clean up generic Dodo redirect parameters if present
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('payment_id')) {
-      if (urlParams.get('status') === 'succeeded') {
-        sessionStorage.setItem('payment_toast', 'success');
-      } else {
-        sessionStorage.setItem('payment_toast', 'failed');
+      const pid = urlParams.get('payment_id');
+      if (pid && !localStorage.getItem(`processed_${pid}`)) {
+        localStorage.setItem(`processed_${pid}`, 'true');
+        if (urlParams.get('status') === 'succeeded') {
+          toast.success("Payment successful! Credits added.");
+        } else {
+          toast.error("Payment failed or was cancelled.");
+        }
       }
       
-      // Perform a hard redirect to completely scrub the history stack
-      window.location.replace('/');
-      return;
+      // Push a clean state to the history stack so the payment_id URL remains in history as a trap
+      window.history.pushState({ appState: 'IDLE', depth: 0 }, document.title, '/');
+      setAppState('IDLE');
     }
 
     const handlePopState = (e: PopStateEvent) => {
+      // If they try to go back to the payment redirect URL, violently throw them forward
+      const currentParams = new URLSearchParams(window.location.search);
+      if (currentParams.has('payment_id')) {
+        window.history.forward();
+        return;
+      }
+
       if (e.state?.trap) {
         window.history.forward();
         return;
