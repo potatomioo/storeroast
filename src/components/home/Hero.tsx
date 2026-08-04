@@ -51,15 +51,17 @@ export default function Hero({ onRoast }: { onRoast: (url: string) => void }) {
           className="mt-12 w-full max-w-2xl relative"
         >
 
-          <div className="relative flex items-center bg-white rounded-xl p-2 pl-6 shadow-2xl border-4 border-black transition-transform">
-            <LinkIcon className="w-6 h-6 text-black mr-3" />
-            <input
-              type="text"
-              placeholder="Paste App Store, Play Store, or Website URL..."
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              className="flex-1 bg-transparent border-none outline-none text-black font-semibold placeholder-gray-400 text-lg md:text-xl"
-            />
+          <div className="relative flex flex-col md:flex-row items-stretch md:items-center bg-white rounded-xl p-2 shadow-2xl border-4 border-black transition-transform w-full gap-2 md:gap-0">
+            <div className="flex items-center flex-1 px-2 md:pl-4">
+              <LinkIcon className="w-5 h-5 md:w-6 md:h-6 text-black mr-2 md:mr-3 shrink-0" />
+              <input
+                type="text"
+                placeholder="Paste App Store, Play Store, or Website URL..."
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                className="flex-1 min-w-0 bg-transparent border-none outline-none text-black font-semibold placeholder-gray-400 text-sm md:text-xl py-2 md:py-0"
+              />
+            </div>
             <button
               onClick={() => {
                 if (!url) return;
@@ -70,7 +72,7 @@ export default function Hero({ onRoast }: { onRoast: (url: string) => void }) {
                   toast.error("Please enter a valid App Store, Google Play, or Website URL.");
                 }
               }}
-              className="bg-black text-white px-8 py-4 rounded-lg font-black text-lg uppercase tracking-wider hover:bg-gray-800 transition-colors shadow-none border-2 border-transparent hover:border-white"
+              className="bg-black text-white px-4 md:px-8 py-3 md:py-4 rounded-lg font-black text-sm md:text-lg uppercase tracking-wider hover:bg-gray-800 transition-colors shadow-none border-2 border-transparent hover:border-white shrink-0 w-full md:w-auto md:ml-2"
             >
               Roast It
             </button>

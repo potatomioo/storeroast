@@ -97,7 +97,7 @@ export default function ReportPage() {
       <ResultTeaser 
         roastData={report} 
         onPaid={() => router.push('/pricing')} 
-        onBack={() => router.push('/')} 
+        onBack={() => window.location.replace('/')} 
         isPaidUser={report.isPaid || (!!session && credits > 0)} 
       />
       

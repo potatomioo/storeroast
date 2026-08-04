@@ -239,7 +239,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center bg-gray-50 text-black relative">
+    <main className="min-h-screen w-full flex flex-col items-center bg-gray-50 text-black relative overflow-x-hidden">
       <div className="absolute top-0 w-full flex justify-center z-50">
         <Header session={session} credits={credits} onLogout={handleLogout} onGetStarted={() => updateState('LOGIN')} onHome={handleHomeClick} onPricing={handlePricingClick} />
       </div>

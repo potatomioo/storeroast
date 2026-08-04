@@ -20,8 +20,8 @@ export async function scrapeWebsite(url: string) {
       if (text.length > 5) textBlocks.push(text);
     });
     
-    // Generate a screenshot URL using Thum.io (free, no-auth public API)
-    const screenshotUrl = `https://image.thum.io/get/width/1200/crop/800/${formattedUrl}`;
+    // Generate a screenshot URL using Thum.io (free, no-auth public API) with a 3-second delay for SPAs
+    const screenshotUrl = `https://image.thum.io/get/width/1200/crop/800/wait/3/${formattedUrl}`;
     
     return {
       type: 'website',
