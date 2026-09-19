@@ -4,7 +4,7 @@ import { adminAuth } from '@/utils/firebaseAdmin';
 
 const client = new DodoPayments({
   bearerToken: process.env.DODO_PAYMENTS_API_KEY || 'dummy',
-  environment: 'test_mode',
+  environment: (process.env.DODO_PAYMENTS_ENVIRONMENT as any) || 'live_mode',
 });
 
 export async function POST(req: NextRequest) {
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
         email: user.email,
         uid: user.uid
       },
-      return_url: 'https://storeroast.live/',
+      return_url: return_url || 'https://storeroast.live/',
     });
 
     return NextResponse.json({ checkout_url: session.checkout_url });

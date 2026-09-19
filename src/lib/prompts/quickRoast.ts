@@ -89,7 +89,7 @@ Return JSON exactly in this format. (DO NOT mention competitors or visuals, this
 {
   "share_certificate": {
     "product_name": "Extract the app/website name (max 3 words)",
-    "brand_color": "Identify the brand's PRIMARY color (e.g., their logo or main buttons). Convert this color into a VERY LIGHT, pastel hex code suitable for a background behind dark text (e.g. if primary is blue, return a light icy blue like #e0f2fe). For dark-mode websites, do NOT use black/dark grey, use a pastel version of their primary accent color. Must be a valid hex code. Return #Facc15 only if absolutely no colors can be found.",
+    "brand_color": "Identify the brand's PRIMARY color. If a themeColor is provided in the data above, convert that color into a VERY LIGHT, pastel hex code suitable for a background behind dark text (e.g. if primary is dark blue, return a light icy blue like #e0f2fe). For dark-mode websites, do NOT use black/dark grey, use a pastel version of their primary accent color. Must be a valid hex code. Return #Facc15 only if absolutely no colors can be found.",
     "main_roast_headline": "One massive funny quote-worthy headline using VERY simple, dumbed-down English. ZERO sophisticated words. (e.g. 'You built a Swiss Army knife, then marketed it like a kitchen drawer exploded.')",
     "roast_pointers": [
       {

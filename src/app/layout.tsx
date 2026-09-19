@@ -16,8 +16,22 @@ const kalam = Kalam({
 });
 
 export const metadata: Metadata = {
-  title: "StoreRoast.live - Find out why you're losing downloads",
-  description: "AI-powered app listing roasts to increase conversion.",
+  metadataBase: new URL("https://storeroast.live"),
+  title: "StoreRoast - Find Out Why You're Losing Downloads",
+  description: "Brutally honest, AI-powered app & website teardowns to fix your messaging and skyrocket conversions.",
+  openGraph: {
+    title: "StoreRoast - Find Out Why You're Losing Downloads",
+    description: "Brutally honest, AI-powered app & website teardowns to fix your messaging and skyrocket conversions.",
+    url: "https://storeroast.live",
+    siteName: "StoreRoast",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "StoreRoast - Find Out Why You're Losing Downloads",
+    description: "Brutally honest, AI-powered app & website teardowns to fix your messaging and skyrocket conversions.",
+  },
 };
 
 export default function RootLayout({

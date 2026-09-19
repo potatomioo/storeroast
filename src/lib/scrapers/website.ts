@@ -20,6 +20,12 @@ export async function scrapeWebsite(url: string) {
       if (text.length > 5) textBlocks.push(text);
     });
     
+    // Extract brand/theme color from meta tags if available
+    const themeColor = $('meta[name="theme-color"]').attr('content')
+      || $('meta[name="msapplication-TileColor"]').attr('content')
+      || $('meta[name="msapplication-navbutton-color"]').attr('content')
+      || null;
+
     // Generate a screenshot URL using Thum.io (free, no-auth public API) with a 3-second delay for SPAs
     const screenshotUrl = `https://image.thum.io/get/width/1200/crop/800/wait/3/${formattedUrl}`;
     
@@ -27,6 +33,7 @@ export async function scrapeWebsite(url: string) {
       type: 'website',
       title,
       description,
+      themeColor,
       visibleText: textBlocks.slice(0, 20).join('\n'), // Limit to first 20 meaningful blocks to save tokens
       screenshots: [screenshotUrl]
     };
