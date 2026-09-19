@@ -6,6 +6,32 @@ import toast from 'react-hot-toast';
 export default function Hero({ onRoast }: { onRoast: (url: string) => void }) {
   const [url, setUrl] = React.useState('');
 
+  const handleRoastSubmit = () => {
+    if (!url.trim()) return;
+    const lower = url.trim().toLowerCase();
+
+    if (lower.includes('storeroast')) {
+      toast("Nice try! I'm not dumb bro 😂 Try your product, not mine!", {
+        icon: '💀',
+        duration: 4000,
+        style: {
+          borderRadius: '16px',
+          background: '#000',
+          color: '#fff',
+          fontWeight: 'bold',
+          border: '2px solid #f7cd46',
+        },
+      });
+      return;
+    }
+
+    if (lower.startsWith('http') || lower.includes('play.google.com') || lower.includes('apps.apple.com') || lower.includes('.')) {
+      onRoast(url.trim());
+    } else {
+      toast.error("Please enter a valid App Store, Google Play, or Website URL.");
+    }
+  };
+
   return (
     <section
       className="w-full pt-32 pb-24 relative flex justify-center"
@@ -59,19 +85,17 @@ export default function Hero({ onRoast }: { onRoast: (url: string) => void }) {
                 placeholder="Paste App Store, Play Store, or Website URL..."
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleRoastSubmit();
+                  }
+                }}
                 className="flex-1 min-w-0 bg-transparent border-none outline-none text-black font-semibold placeholder-gray-400 text-sm md:text-xl py-2 md:py-0"
               />
             </div>
             <button
-              onClick={() => {
-                if (!url) return;
-                const lower = url.toLowerCase();
-                if (lower.startsWith('http') || lower.includes('play.google.com') || lower.includes('apps.apple.com') || lower.includes('.')) {
-                  onRoast(url);
-                } else {
-                  toast.error("Please enter a valid App Store, Google Play, or Website URL.");
-                }
-              }}
+              onClick={handleRoastSubmit}
               className="bg-black text-white px-4 md:px-8 py-3 md:py-4 rounded-lg font-black text-sm md:text-lg uppercase tracking-wider hover:bg-gray-800 transition-colors shadow-none border-2 border-transparent hover:border-white shrink-0 w-full md:w-auto md:ml-2"
             >
               Roast It
