@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     const session = await client.checkoutSessions.create({
       product_cart: [
         {
-          product_id: 'pdt_0NiWKj0bTQDcbIpGEtl68',
+          product_id: process.env.DODO_PRODUCT_ID || 'pdt_0NiWKj0bTQDcbIpGEtl68',
           quantity: 1
         }
       ],
