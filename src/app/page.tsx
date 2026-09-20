@@ -167,7 +167,7 @@ export default function Home() {
     }
     
     try {
-      const token = await session.getIdToken();
+      const token = await session.getIdToken(true);
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: {
