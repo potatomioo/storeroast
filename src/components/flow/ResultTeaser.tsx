@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Share2, ArrowLeft, ShieldCheck, Zap, Award, XCircle, ArrowDown } from 'lucide-react';
+import { Lock, Share2, ArrowLeft, ShieldCheck, Zap, Award, XCircle, ArrowDown, Sparkles } from 'lucide-react';
 import * as htmlToImage from 'html-to-image';
 
 const ANNOTATION_PHRASES = ['Oof.', '💀', 'Bruh.', 'Yikes.', '💀 Certified.', 'Too far?'];
@@ -252,6 +252,83 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
         </div>
       </motion.div>
 
+      {/* =========================================
+          LOCKED VERIFIED VISUAL REPORT PREVIEW (Free Users Only)
+          ========================================= */}
+      {!isPaidUser && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="w-full max-w-2xl mx-auto mb-16 relative px-2"
+        >
+          <div
+            onClick={onPaid}
+            className="cursor-pointer group relative bg-white border-4 border-black rounded-[2.5rem] p-6 md:p-10 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all duration-300 flex flex-col items-center"
+          >
+            {/* Top Bar inside Card */}
+            <div className="w-full flex items-center justify-between mb-6 flex-wrap gap-2">
+              <div className="flex items-center gap-2 bg-black text-[var(--primary-yellow)] px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-sm">
+                <Lock className="w-3.5 h-3.5" />
+                <span>Paid Visual Report</span>
+              </div>
+              <div className="rotate-2 border-2 border-red-600 text-red-600 px-3 py-1 text-xs font-black uppercase tracking-widest rounded-sm bg-red-50 shadow-sm mix-blend-multiply">
+                VERIFIED PREVIEW
+              </div>
+            </div>
+
+            {/* Headline & Explanation */}
+            <div className="text-center mb-6 max-w-lg">
+              <h3 className="text-2xl md:text-3xl font-black text-black font-handwriting leading-tight mb-2">
+                Want your actual screenshots & competitor teardowns like this?
+              </h3>
+              <p className="text-sm font-medium text-gray-600 leading-relaxed">
+                Free roasts only inspect text. The <strong className="text-black font-bold">Deep Burn</strong> analyzes your live product screenshots, visual hierarchy, and roasts you against your biggest competitors.
+              </p>
+            </div>
+
+            {/* The Visual Representation - Lightly Blurred Ticket */}
+            <div className="relative w-full max-w-md rounded-2xl border-4 border-black overflow-hidden shadow-xl bg-amber-50/60 group-hover:border-black transition-all">
+              <img
+                src="/sample-verified-roast.png"
+                alt="Verified Roast Report Preview"
+                className="w-full h-auto object-cover filter blur-[2px] transition-all duration-500 group-hover:blur-[1.2px] select-none scale-[1.01]"
+              />
+
+              {/* Centered Floating Lock Overlay */}
+              <div className="absolute inset-0 bg-black/30 backdrop-blur-[0.5px] flex flex-col items-center justify-center p-6 text-center transition-all group-hover:bg-black/20">
+                <div className="bg-black/90 text-white border-2 border-[var(--primary-yellow)] p-6 rounded-2xl shadow-2xl flex flex-col items-center gap-2.5 max-w-xs transform group-hover:scale-105 transition-transform duration-300">
+                  <div className="w-12 h-12 rounded-full bg-[var(--primary-yellow)] text-black flex items-center justify-center shadow-lg animate-pulse">
+                    <Lock className="w-6 h-6" />
+                  </div>
+                  <div className="text-xl md:text-2xl font-black font-handwriting text-[var(--primary-yellow)] leading-none mt-1">
+                    Visual Report Locked
+                  </div>
+                  <p className="text-xs text-gray-300 font-medium leading-relaxed">
+                    Includes full screenshot extraction, computer-vision critique & competitor teardown.
+                  </p>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPaid();
+                    }}
+                    className="mt-2 w-full bg-[var(--primary-yellow)] text-black py-3 px-5 rounded-xl font-black text-xs md:text-sm uppercase tracking-wider hover:bg-yellow-300 active:scale-95 transition-all shadow-[2px_2px_0px_0px_rgba(255,255,255,0.4)] flex items-center justify-center gap-2"
+                  >
+                    <Award className="w-4 h-4" />
+                    <span>Unlock For 1 Credit ($1.99)</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom click hint */}
+            <div className="mt-5 flex items-center gap-2 text-xs font-bold text-gray-500 group-hover:text-black transition-colors">
+              <Sparkles className="w-4 h-4 text-yellow-500" />
+              <span>Tap anywhere to unlock your Verified Deep Burn ticket</span>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* =========================================
           DIVIDER
@@ -278,6 +355,57 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
               </div>
             </div>
           ))}
+
+          {/* Locked Detailed Breakdown Cards for Free Users */}
+          {!isPaidUser && (
+            <>
+              <div
+                onClick={onPaid}
+                className="cursor-pointer group bg-gradient-to-r from-gray-50 to-amber-50/50 border-2 border-dashed border-black/40 hover:border-black p-6 md:p-8 rounded-2xl shadow-sm hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all flex flex-col relative overflow-hidden"
+              >
+                <div className="flex justify-between items-center mb-3">
+                  <div className="text-sm font-black uppercase tracking-widest text-black/50 font-handwriting">
+                    Visuals & Screenshot Critique
+                  </div>
+                  <span className="flex items-center gap-1.5 text-xs font-black bg-black text-[var(--primary-yellow)] px-3 py-1 rounded-full shadow-sm">
+                    <Lock className="w-3 h-3" /> Locked
+                  </span>
+                </div>
+                <p className="text-base md:text-lg font-bold text-gray-400 blur-[2px] select-none font-handwriting mb-4">
+                  "Your screenshot visual hierarchy feels like an instruction manual that nobody asked for."
+                </p>
+                <div className="flex items-center justify-between text-xs font-bold text-black/70 group-hover:text-black mt-auto pt-2 border-t border-black/10">
+                  <span>Included in Deep Burn ($1.99)</span>
+                  <span className="flex items-center gap-1 font-black text-black group-hover:translate-x-1 transition-transform">
+                    Unlock Report →
+                  </span>
+                </div>
+              </div>
+
+              <div
+                onClick={onPaid}
+                className="cursor-pointer group bg-gradient-to-r from-gray-50 to-amber-50/50 border-2 border-dashed border-black/40 hover:border-black p-6 md:p-8 rounded-2xl shadow-sm hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all flex flex-col relative overflow-hidden"
+              >
+                <div className="flex justify-between items-center mb-3">
+                  <div className="text-sm font-black uppercase tracking-widest text-black/50 font-handwriting">
+                    Competitor Benchmarking
+                  </div>
+                  <span className="flex items-center gap-1.5 text-xs font-black bg-black text-[var(--primary-yellow)] px-3 py-1 rounded-full shadow-sm">
+                    <Lock className="w-3 h-3" /> Locked
+                  </span>
+                </div>
+                <p className="text-base md:text-lg font-bold text-gray-400 blur-[2px] select-none font-handwriting mb-4">
+                  "Top competitors communicate value in 3 seconds; yours takes 3 scrolls."
+                </p>
+                <div className="flex items-center justify-between text-xs font-bold text-black/70 group-hover:text-black mt-auto pt-2 border-t border-black/10">
+                  <span>Included in Deep Burn ($1.99)</span>
+                  <span className="flex items-center gap-1 font-black text-black group-hover:translate-x-1 transition-transform">
+                    Unlock Report →
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* =========================================
@@ -285,15 +413,28 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
             ========================================= */}
         {!isPaidUser && (
           <div className="relative mt-8">
-            <div className="bg-white border-4 border-black rounded-3xl p-10 md:p-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative z-20 text-center md:text-left flex flex-col md:flex-row items-center gap-10">
-              <div className="flex-1">
-                <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
-                  <Lock className="w-6 h-6 text-black" />
-                  <h4 className="text-3xl font-black text-black uppercase tracking-tight font-handwriting">Unlock Visual Roast:</h4>
+            <div className="bg-white border-4 border-black rounded-3xl p-8 md:p-10 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative z-20 text-center md:text-left flex flex-col md:flex-row items-center gap-8">
+              {/* Thumbnail of Verified Ticket */}
+              <div 
+                onClick={onPaid}
+                className="w-28 md:w-32 shrink-0 aspect-[3/4] rounded-xl border-2 border-black overflow-hidden shadow-md cursor-pointer hover:scale-105 transition-transform relative group hidden sm:block bg-amber-50"
+              >
+                <img src="/sample-verified-roast.png" alt="Preview" className="w-full h-full object-cover filter blur-[1.5px]" />
+                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                  <div className="p-2 rounded-full bg-black text-[var(--primary-yellow)] shadow-lg">
+                    <Lock className="w-4 h-4" />
+                  </div>
                 </div>
-                <p className="text-black/70 font-bold mb-8 text-lg font-handwriting">You've only seen the basics, Visuals are still remaining. Unlock the Visual Roast Ticket and full pointer breakdown.</p>
+              </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 md:mb-0">
+              <div className="flex-1">
+                <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
+                  <Lock className="w-6 h-6 text-black" />
+                  <h4 className="text-2xl md:text-3xl font-black text-black uppercase tracking-tight font-handwriting">Unlock Visual Roast:</h4>
+                </div>
+                <p className="text-black/70 font-bold mb-6 text-base md:text-lg font-handwriting">You've only seen the basics, Visuals are still remaining. Unlock the Visual Roast Ticket and full pointer breakdown.</p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6 md:mb-0">
                   {['Visual Roast', 'Competitor Benchmark', 'Brutal Report', 'Detailed Breakdown'].map((feature, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <div className="w-5 h-5 rounded-full bg-black text-[var(--primary-yellow)] flex items-center justify-center shrink-0">
@@ -305,10 +446,10 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
                 </div>
               </div>
 
-              <div className="w-full md:w-64 shrink-0">
+              <div className="w-full md:w-56 shrink-0">
                 <button onClick={onPaid} className="w-full bg-black text-white py-5 px-6 rounded-2xl font-bold text-lg hover:bg-gray-800 active:translate-y-1 active:shadow-none transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
                   <span>Unlock Now</span>
-                  <span className="text-xs font-bold text-white/50 mt-1">1 Credit</span>
+                  <span className="text-xs font-bold text-white/50 mt-1">1 Credit ($1.99)</span>
                 </button>
               </div>
             </div>
