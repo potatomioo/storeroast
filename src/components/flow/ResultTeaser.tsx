@@ -267,11 +267,7 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
             className="cursor-pointer group relative bg-white border-4 border-black rounded-[2.5rem] p-6 md:p-10 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all duration-300 flex flex-col items-center"
           >
             {/* Top Bar inside Card */}
-            <div className="w-full flex items-center justify-between mb-6 flex-wrap gap-2">
-              <div className="flex items-center gap-2 bg-black text-[var(--primary-yellow)] px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-sm">
-                <Lock className="w-3.5 h-3.5" />
-                <span>Paid Visual Report</span>
-              </div>
+            <div className="w-full flex items-center justify-end mb-4">
               <div className="rotate-2 border-2 border-red-600 text-red-600 px-3 py-1 text-xs font-black uppercase tracking-widest rounded-sm bg-red-50 shadow-sm mix-blend-multiply">
                 VERIFIED PREVIEW
               </div>
@@ -295,27 +291,27 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
                 className="w-full h-auto object-cover filter blur-[2px] transition-all duration-500 group-hover:blur-[1.2px] select-none scale-[1.01]"
               />
 
-              {/* Centered Floating Lock Overlay */}
-              <div className="absolute inset-0 bg-black/30 backdrop-blur-[0.5px] flex flex-col items-center justify-center p-6 text-center transition-all group-hover:bg-black/20">
-                <div className="bg-black/90 text-white border-2 border-[var(--primary-yellow)] p-6 rounded-2xl shadow-2xl flex flex-col items-center gap-2.5 max-w-xs transform group-hover:scale-105 transition-transform duration-300">
-                  <div className="w-12 h-12 rounded-full bg-[var(--primary-yellow)] text-black flex items-center justify-center shadow-lg animate-pulse">
-                    <Lock className="w-6 h-6" />
+              {/* Centered Floating Lock Overlay (Compact & Sleek) */}
+              <div className="absolute inset-0 bg-black/30 backdrop-blur-[0.5px] flex flex-col items-center justify-center p-4 text-center transition-all group-hover:bg-black/20">
+                <div className="bg-black/90 text-white border-2 border-[var(--primary-yellow)] px-4 py-3.5 rounded-xl shadow-2xl flex flex-col items-center gap-2 max-w-[220px] transform group-hover:scale-105 transition-transform duration-300">
+                  <div className="w-8 h-8 rounded-full bg-[var(--primary-yellow)] text-black flex items-center justify-center shadow-md animate-pulse">
+                    <Lock className="w-4 h-4" />
                   </div>
-                  <div className="text-xl md:text-2xl font-black font-handwriting text-[var(--primary-yellow)] leading-none mt-1">
+                  <div className="text-base font-black font-handwriting text-[var(--primary-yellow)] leading-none">
                     Visual Report Locked
                   </div>
-                  <p className="text-xs text-gray-300 font-medium leading-relaxed">
-                    Includes full screenshot extraction, computer-vision critique & competitor teardown.
+                  <p className="text-[10px] text-gray-300 font-medium leading-tight">
+                    Screenshot critique & competitor teardown.
                   </p>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       onPaid();
                     }}
-                    className="mt-2 w-full bg-[var(--primary-yellow)] text-black py-3 px-5 rounded-xl font-black text-xs md:text-sm uppercase tracking-wider hover:bg-yellow-300 active:scale-95 transition-all shadow-[2px_2px_0px_0px_rgba(255,255,255,0.4)] flex items-center justify-center gap-2"
+                    className="mt-1 w-full bg-[var(--primary-yellow)] text-black py-2 px-3 rounded-lg font-black text-[11px] uppercase tracking-wider hover:bg-yellow-300 active:scale-95 transition-all shadow-[2px_2px_0px_0px_rgba(255,255,255,0.3)] flex items-center justify-center gap-1.5"
                   >
-                    <Award className="w-4 h-4" />
-                    <span>Unlock For 1 Credit ($1.99)</span>
+                    <Award className="w-3.5 h-3.5" />
+                    <span>Unlock Now for 1 Credit</span>
                   </button>
                 </div>
               </div>
@@ -375,7 +371,7 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
                   "Your screenshot visual hierarchy feels like an instruction manual that nobody asked for."
                 </p>
                 <div className="flex items-center justify-between text-xs font-bold text-black/70 group-hover:text-black mt-auto pt-2 border-t border-black/10">
-                  <span>Included in Deep Burn ($1.99)</span>
+                  <span>Included with 1 Credit</span>
                   <span className="flex items-center gap-1 font-black text-black group-hover:translate-x-1 transition-transform">
                     Unlock Report →
                   </span>
@@ -398,7 +394,7 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
                   "Top competitors communicate value in 3 seconds; yours takes 3 scrolls."
                 </p>
                 <div className="flex items-center justify-between text-xs font-bold text-black/70 group-hover:text-black mt-auto pt-2 border-t border-black/10">
-                  <span>Included in Deep Burn ($1.99)</span>
+                  <span>Included with 1 Credit</span>
                   <span className="flex items-center gap-1 font-black text-black group-hover:translate-x-1 transition-transform">
                     Unlock Report →
                   </span>
@@ -447,9 +443,8 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
               </div>
 
               <div className="w-full md:w-56 shrink-0">
-                <button onClick={onPaid} className="w-full bg-black text-white py-5 px-6 rounded-2xl font-bold text-lg hover:bg-gray-800 active:translate-y-1 active:shadow-none transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
-                  <span>Unlock Now</span>
-                  <span className="text-xs font-bold text-white/50 mt-1">1 Credit ($1.99)</span>
+                <button onClick={onPaid} className="w-full bg-black text-white py-4 px-5 rounded-2xl font-bold text-base hover:bg-gray-800 active:translate-y-1 active:shadow-none transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center text-center">
+                  <span>Unlock Now for 1 Credit</span>
                 </button>
               </div>
             </div>
