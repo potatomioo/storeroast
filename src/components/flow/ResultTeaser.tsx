@@ -273,13 +273,16 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
               </div>
             </div>
 
-            {/* Headline & Explanation */}
-            <div className="text-center mb-5 max-w-md">
-              <h3 className="text-2xl md:text-3xl font-black text-black font-handwriting leading-tight mb-1.5">
+            {/* Section Title & Subtitle */}
+            <div className="text-center mb-5 max-w-lg">
+              <div className="flex items-center justify-center gap-2 mb-1.5">
+                <Lock className="w-5 h-5 md:w-6 md:h-6 text-black stroke-[2.5]" />
+                <h3 className="text-3xl md:text-4xl font-black text-black font-handwriting leading-tight">
+                  Visual Report
+                </h3>
+              </div>
+              <p className="text-sm md:text-base font-bold text-black/70 font-handwriting leading-relaxed">
                 Want your actual screenshots & competitor teardowns like this?
-              </h3>
-              <p className="text-xs md:text-sm font-medium text-gray-600 leading-relaxed">
-                The <strong className="text-black font-bold">Deep Burn</strong> analyzes live product screenshots, visual hierarchy, and competitor roasts.
               </p>
             </div>
 
@@ -291,17 +294,12 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
                 className="w-full h-auto object-cover filter blur-[1.5px] transition-all duration-500 group-hover:blur-[1px] select-none scale-[1.01]"
               />
 
-              {/* Clean Translucent Overlay - No solid black box, just lock + title + button */}
-              <div className="absolute inset-0 bg-black/35 backdrop-blur-[1.5px] flex flex-col items-center justify-center p-6 text-center transition-all group-hover:bg-black/25">
+              {/* Clean Translucent Overlay - Lock badge & button only */}
+              <div className="absolute inset-0 bg-black/25 backdrop-blur-[1px] flex flex-col items-center justify-center p-6 text-center transition-all group-hover:bg-black/15">
                 {/* Floating Lock Badge */}
-                <div className="w-12 h-12 rounded-full bg-[var(--primary-yellow)] text-black border-2 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-3 animate-pulse">
+                <div className="w-12 h-12 rounded-full bg-[var(--primary-yellow)] text-black border-2 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-4 animate-pulse">
                   <Lock className="w-5 h-5 stroke-[2.5]" />
                 </div>
-
-                {/* Title */}
-                <h4 className="text-2xl md:text-3xl font-black font-handwriting text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] mb-4 tracking-tight">
-                  Visual Report Locked
-                </h4>
 
                 {/* Button */}
                 <button
