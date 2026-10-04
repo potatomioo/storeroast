@@ -264,22 +264,22 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
         >
           <div
             onClick={onPaid}
-            className="cursor-pointer group relative bg-white border-4 border-black rounded-[2.5rem] p-6 md:p-10 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all duration-300 flex flex-col items-center"
+            className="cursor-pointer group relative bg-white border-4 border-black rounded-[2rem] p-6 md:p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all duration-300 flex flex-col items-center"
           >
             {/* Top Bar inside Card */}
-            <div className="w-full flex items-center justify-end mb-4">
-              <div className="rotate-2 border-2 border-red-600 text-red-600 px-3 py-1 text-xs font-black uppercase tracking-widest rounded-sm bg-red-50 shadow-sm mix-blend-multiply">
+            <div className="w-full flex items-center justify-end mb-3">
+              <div className="rotate-2 border-2 border-red-600 text-red-600 px-3 py-0.5 text-xs font-black uppercase tracking-widest rounded-sm bg-red-50 shadow-sm mix-blend-multiply">
                 VERIFIED PREVIEW
               </div>
             </div>
 
             {/* Headline & Explanation */}
-            <div className="text-center mb-6 max-w-lg">
-              <h3 className="text-2xl md:text-3xl font-black text-black font-handwriting leading-tight mb-2">
+            <div className="text-center mb-5 max-w-md">
+              <h3 className="text-2xl md:text-3xl font-black text-black font-handwriting leading-tight mb-1.5">
                 Want your actual screenshots & competitor teardowns like this?
               </h3>
-              <p className="text-sm font-medium text-gray-600 leading-relaxed">
-                Free roasts only inspect text. The <strong className="text-black font-bold">Deep Burn</strong> analyzes your live product screenshots, visual hierarchy, and roasts you against your biggest competitors.
+              <p className="text-xs md:text-sm font-medium text-gray-600 leading-relaxed">
+                The <strong className="text-black font-bold">Deep Burn</strong> analyzes live product screenshots, visual hierarchy, and competitor roasts.
               </p>
             </div>
 
@@ -288,38 +288,38 @@ export default function ResultTeaser({ roastData, onPaid, onBack, isPaidUser }: 
               <img
                 src="/sample-verified-roast.png"
                 alt="Verified Roast Report Preview"
-                className="w-full h-auto object-cover filter blur-[2px] transition-all duration-500 group-hover:blur-[1.2px] select-none scale-[1.01]"
+                className="w-full h-auto object-cover filter blur-[1.5px] transition-all duration-500 group-hover:blur-[1px] select-none scale-[1.01]"
               />
 
-              {/* Centered Floating Lock Overlay (Compact & Sleek) */}
-              <div className="absolute inset-0 bg-black/30 backdrop-blur-[0.5px] flex flex-col items-center justify-center p-4 text-center transition-all group-hover:bg-black/20">
-                <div className="bg-black/90 text-white border-2 border-[var(--primary-yellow)] px-4 py-3.5 rounded-xl shadow-2xl flex flex-col items-center gap-2 max-w-[220px] transform group-hover:scale-105 transition-transform duration-300">
-                  <div className="w-8 h-8 rounded-full bg-[var(--primary-yellow)] text-black flex items-center justify-center shadow-md animate-pulse">
-                    <Lock className="w-4 h-4" />
-                  </div>
-                  <div className="text-base font-black font-handwriting text-[var(--primary-yellow)] leading-none">
-                    Visual Report Locked
-                  </div>
-                  <p className="text-[10px] text-gray-300 font-medium leading-tight">
-                    Screenshot critique & competitor teardown.
-                  </p>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onPaid();
-                    }}
-                    className="mt-1 w-full bg-[var(--primary-yellow)] text-black py-2 px-3 rounded-lg font-black text-[11px] uppercase tracking-wider hover:bg-yellow-300 active:scale-95 transition-all shadow-[2px_2px_0px_0px_rgba(255,255,255,0.3)] flex items-center justify-center gap-1.5"
-                  >
-                    <Award className="w-3.5 h-3.5" />
-                    <span>Unlock Now for 1 Credit</span>
-                  </button>
+              {/* Clean Translucent Overlay - No solid black box, just lock + title + button */}
+              <div className="absolute inset-0 bg-black/35 backdrop-blur-[1.5px] flex flex-col items-center justify-center p-6 text-center transition-all group-hover:bg-black/25">
+                {/* Floating Lock Badge */}
+                <div className="w-12 h-12 rounded-full bg-[var(--primary-yellow)] text-black border-2 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-3 animate-pulse">
+                  <Lock className="w-5 h-5 stroke-[2.5]" />
                 </div>
+
+                {/* Title */}
+                <h4 className="text-2xl md:text-3xl font-black font-handwriting text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] mb-4 tracking-tight">
+                  Visual Report Locked
+                </h4>
+
+                {/* Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPaid();
+                  }}
+                  className="bg-[var(--primary-yellow)] border-2 border-black text-black py-3 px-6 rounded-xl font-black text-xs md:text-sm uppercase tracking-wider hover:bg-yellow-300 active:scale-95 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center gap-2"
+                >
+                  <Award className="w-4 h-4" />
+                  <span>Unlock Now for 1 Credit</span>
+                </button>
               </div>
             </div>
 
             {/* Bottom click hint */}
-            <div className="mt-5 flex items-center gap-2 text-xs font-bold text-gray-500 group-hover:text-black transition-colors">
-              <Sparkles className="w-4 h-4 text-yellow-500" />
+            <div className="mt-4 flex items-center gap-2 text-xs font-bold text-gray-500 group-hover:text-black transition-colors">
+              <Sparkles className="w-3.5 h-3.5 text-yellow-500" />
               <span>Tap anywhere to unlock your Verified Deep Burn ticket</span>
             </div>
           </div>
